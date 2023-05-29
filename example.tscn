@@ -1,0 +1,68 @@
+[gd_scene load_steps=3 format=3 uid="uid://d2bii41ego0fp"]
+
+[ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/unfolded_option_button.gd" id="1_uykbc"]
+[ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/view_switcher.gd" id="2_rorhm"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_lock_ = true
+
+[node name="UnfoldedOptionButton" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 28.0
+offset_right = 248.0
+offset_bottom = 129.0
+script = ExtResource("1_uykbc")
+options = Array[String](["1", "2", "3"])
+value = 1
+
+[node name="ViewSwitcher" type="Control" parent="."]
+visible = false
+anchors_preset = 0
+offset_left = 324.0
+offset_top = 115.0
+offset_right = 364.0
+offset_bottom = 155.0
+script = ExtResource("2_rorhm")
+background = NodePath("ColorRect")
+
+[node name="ColorRect" type="ColorRect" parent="ViewSwitcher"]
+layout_mode = 0
+offset_left = -149.0
+offset_top = -29.0
+offset_right = 280.0
+offset_bottom = 247.0
+color = Color(0, 0, 0, 1)
+
+[node name="ColorRect2" type="ColorRect" parent="ViewSwitcher"]
+visible = false
+layout_mode = 0
+offset_left = -57.0
+offset_top = 37.0
+offset_right = -17.0
+offset_bottom = 77.0
+color = Color(0.682353, 0.615686, 0.615686, 1)
+
+[node name="ColorRect3" type="ColorRect" parent="ViewSwitcher"]
+visible = false
+layout_mode = 0
+offset_left = 5.0
+offset_top = 102.0
+offset_right = 45.0
+offset_bottom = 142.0
+color = Color(0.682353, 0.615686, 0.615686, 1)
+
+[node name="ColorRect4" type="ColorRect" parent="ViewSwitcher"]
+visible = false
+layout_mode = 0
+offset_left = 114.0
+offset_top = 45.0
+offset_right = 154.0
+offset_bottom = 85.0
+color = Color(0.682353, 0.615686, 0.615686, 1)
