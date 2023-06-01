@@ -1,7 +1,29 @@
-[gd_scene load_steps=3 format=3 uid="uid://d2bii41ego0fp"]
+[gd_scene load_steps=5 format=3 uid="uid://d2bii41ego0fp"]
 
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/unfolded_option_button.gd" id="1_uykbc"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/view_switcher.gd" id="2_rorhm"]
+[ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/properties_box.gd" id="3_nn7w5"]
+
+[sub_resource type="GDScript" id="GDScript_43ggq"]
+script/source = "extends Control
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+  $\"PropertiesBox\".add_int(\"It's an Int\", 1)
+  $\"PropertiesBox\".add_string(\"It's a String\", \"\")
+  $\"PropertiesBox\".add_group(\"Group\")
+  $\"PropertiesBox\".add_options(\"Take a pick...\", [
+    \"First\",
+    \"Second\",
+    \"Third\",
+  ], 1, true)
+  $\"PropertiesBox\".add_group(\"Nested Group\")
+  $\"PropertiesBox\".add_bool(\"Check!\", false)
+  $\"PropertiesBox\".end_group()
+  $\"PropertiesBox\".add_float(\"Slider!\", 0, 0, 200, 0.1)
+  $\"PropertiesBox\".end_group()
+"
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -10,6 +32,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = SubResource("GDScript_43ggq")
 metadata/_edit_lock_ = true
 
 [node name="UnfoldedOptionButton" type="VBoxContainer" parent="."]
@@ -66,3 +89,11 @@ offset_top = 45.0
 offset_right = 154.0
 offset_bottom = 85.0
 color = Color(0.682353, 0.615686, 0.615686, 1)
+
+[node name="PropertiesBox" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 253.0
+offset_top = 43.0
+offset_right = 780.0
+offset_bottom = 263.0
+script = ExtResource("3_nn7w5")
