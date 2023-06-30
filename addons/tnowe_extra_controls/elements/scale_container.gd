@@ -1,4 +1,5 @@
 @tool
+class_name ScaleContainer
 extends Container
 
 ## Container that scales children to fit it, instead of resizing them. Can be used for pixel-perfect game viewports.

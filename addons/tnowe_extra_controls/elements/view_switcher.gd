@@ -1,4 +1,5 @@
 @tool
+class_name ViewSwitcher
 extends Control
 
 ## When a child becomes visible, hides all other children. Optional, background to show while any item is visible.

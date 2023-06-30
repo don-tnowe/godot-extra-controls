@@ -1,4 +1,5 @@
 @tool
+class_name UnfoldedOptionButton
 extends VBoxContainer
 
 ## A list of option laid out as a vertical box of checkboxes. Supports multi-select similar to the "export_flags" export hint.

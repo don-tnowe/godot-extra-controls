@@ -1,4 +1,7 @@
+class_name DataDropper
 extends Control
+
+## Passes [method Control._drop_data] as a signal instead of an override.
 
 signal data_drop_request(at_position : Vector2, data : Variant)
 signal data_dropped(at_position : Vector2, data : Variant)

@@ -1,3 +1,4 @@
+class_name PropertiesBox
 extends VBoxContainer
 
 ## A form to input multiple values of different types. Supports numbers, strings, and options (as in [UnfoldedOptionButton])

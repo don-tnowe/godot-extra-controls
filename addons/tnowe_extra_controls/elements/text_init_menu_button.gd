@@ -1,4 +1,5 @@
 @tool
+class_name TextInitMenuButton
 extends MenuButton
 
 ## A MenuButton initialized with text. Supports submenus.

@@ -1,3 +1,4 @@
+class_name FlippedHSplitContainer
 extends HSplitContainer
 
 ## A split container that is anchored to the other side. When it's resized by a parent, the other child item keeps its size.
