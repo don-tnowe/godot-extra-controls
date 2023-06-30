@@ -14,6 +14,7 @@ var element_scripts := [
 # See above, this is a similar class  # ["TextInitPopupMenu", preload(elements_dir + "text_init_popup_menu.gd"), null],
 	["ThemeIconButton", preload(elements_dir + "theme_icon_button.gd"), null],
 	["ViewSwitcher", preload(elements_dir + "view_switcher.gd"), null],
+	["ScaleContainer", preload(elements_dir + "scale_container.gd"), null],
 ]
 
 
