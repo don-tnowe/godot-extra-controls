@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://d2bii41ego0fp"]
+[gd_scene load_steps=8 format=3 uid="uid://d2bii41ego0fp"]
 
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/unfolded_option_button.gd" id="1_uykbc"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/view_switcher.gd" id="2_rorhm"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/properties_box.gd" id="3_nn7w5"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/scale_container.gd" id="4_c4kjh"]
 [ext_resource type="Texture2D" uid="uid://6lx2qwr7mkwg" path="res://icon.svg" id="4_yfgq0"]
+[ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/max_size_container.gd" id="6_ri1pc"]
 
 [sub_resource type="GDScript" id="GDScript_43ggq"]
 script/source = "extends Control
@@ -131,3 +132,16 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("4_yfgq0")
 expand_mode = 1
+
+[node name="MaxSizeContainer" type="Container" parent="."]
+layout_mode = 0
+offset_left = 293.0
+offset_top = 46.0
+offset_right = 1044.0
+offset_bottom = 221.0
+script = ExtResource("6_ri1pc")
+max_size = Vector2(480, -1)
+
+[node name="ColorRect" type="ColorRect" parent="MaxSizeContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
