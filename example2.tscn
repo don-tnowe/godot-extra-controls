@@ -1,0 +1,51 @@
+[gd_scene load_steps=3 format=3 uid="uid://p0r2ouvm383h"]
+
+[ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/dock_container.gd" id="1_jgdh4"]
+
+[sub_resource type="GDScript" id="GDScript_v1ouy"]
+script/source = "extends HBoxContainer
+
+@export var docks : Container
+
+func _on_button_pressed():
+  var new_node := ColorRect.new()
+  new_node.color = Color.from_hsv(randf(), randf_range(0.2, 0.5), 1.0)
+  new_node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+  new_node.custom_minimum_size = Vector2(32, 32)
+  docks.drop_node(new_node, Vector2(randf() * docks.size.x, randf() * docks.size.y))
+"
+
+[node name="Box" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_lock_ = true
+
+[node name="Control" type="Control" parent="."]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+
+[node name="Example2" type="Container" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_default_cursor_shape = 10
+script = ExtResource("1_jgdh4")
+metadata/_edit_lock_ = true
+
+[node name="Box" type="HBoxContainer" parent="." node_paths=PackedStringArray("docks")]
+layout_mode = 2
+alignment = 1
+script = SubResource("GDScript_v1ouy")
+docks = NodePath("../Example2")
+
+[node name="Button" type="Button" parent="Box"]
+layout_mode = 2
+text = "Add Node"
+
+[node name="Control2" type="Control" parent="."]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+
+[connection signal="pressed" from="Box/Button" to="Box" method="_on_button_pressed"]

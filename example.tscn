@@ -40,10 +40,10 @@ metadata/_edit_lock_ = true
 
 [node name="UnfoldedOptionButton" type="VBoxContainer" parent="."]
 layout_mode = 0
-offset_left = 32.0
-offset_top = 28.0
-offset_right = 248.0
-offset_bottom = 129.0
+offset_left = 45.0
+offset_top = 45.0
+offset_right = 261.0
+offset_bottom = 146.0
 script = ExtResource("1_uykbc")
 options = Array[String](["1", "2", "3"])
 value = 1
@@ -67,7 +67,6 @@ offset_bottom = 247.0
 color = Color(0, 0, 0, 1)
 
 [node name="ColorRect2" type="ColorRect" parent="ViewSwitcher"]
-visible = false
 layout_mode = 0
 offset_left = -57.0
 offset_top = 37.0
@@ -95,21 +94,20 @@ color = Color(0.682353, 0.615686, 0.615686, 1)
 
 [node name="PropertiesBox" type="VBoxContainer" parent="."]
 layout_mode = 0
-offset_left = 253.0
-offset_top = 43.0
-offset_right = 780.0
-offset_bottom = 263.0
+offset_left = 35.0
+offset_top = 217.0
+offset_right = 562.0
+offset_bottom = 437.0
 script = ExtResource("3_nn7w5")
 
 [node name="ScaleContainer" type="Container" parent="."]
 layout_mode = 1
 offset_left = 572.0
 offset_top = 281.0
-offset_right = 1120.0
-offset_bottom = 562.0
+offset_right = 1042.0
+offset_bottom = 617.0
 script = ExtResource("4_c4kjh")
 stretch_mode = 1
-rounding_mode = 1
 metadata/_edit_group_ = true
 
 [node name="ColorRect" type="ColorRect" parent="ScaleContainer"]
@@ -137,8 +135,8 @@ expand_mode = 1
 layout_mode = 0
 offset_left = 293.0
 offset_top = 46.0
-offset_right = 1044.0
-offset_bottom = 221.0
+offset_right = 989.0
+offset_bottom = 222.0
 script = ExtResource("6_ri1pc")
 max_size = Vector2(480, -1)
 
