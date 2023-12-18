@@ -15,6 +15,9 @@ var element_scripts := [
 	["ThemeIconButton", preload(elements_dir + "theme_icon_button.gd"), null],
 	["ViewSwitcher", preload(elements_dir + "view_switcher.gd"), null],
 	["ScaleContainer", preload(elements_dir + "scale_container.gd"), null],
+	["ChildTransformContainer", preload(elements_dir + "child_transform_container.gd"), null],
+	["ChildSimpleTransformContainer", preload(elements_dir + "child_simple_transform_container.gd"), null],
+	["RemoteTransformRect", preload(elements_dir + "remote_transform_rect.gd"), null],
 ]
 
 
