@@ -37,7 +37,7 @@ func _draw():
   if update_size:
     var new_size := size * target_scale * xform.get_scale()
     target.custom_minimum_size = new_size
-    target.size = size * new_size
+    target.size = new_size
 
   if update_position:
     if use_global_coordinates: target.global_position = xform.origin
