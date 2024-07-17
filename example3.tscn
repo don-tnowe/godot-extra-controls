@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://otiqtdkob4hn"]
+[gd_scene load_steps=4 format=3 uid="uid://dalf3ei7chg62"]
 
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/interpolated_flow_container.gd" id="1_2xacy"]
+[ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/draggable.gd" id="1_huoov"]
 
 [sub_resource type="GDScript" id="GDScript_vfo4w"]
 script/source = "extends Node
@@ -44,8 +45,12 @@ offset_left = 32.0
 offset_top = 12.0
 offset_right = 680.0
 offset_bottom = 308.0
+script = ExtResource("1_huoov")
+resize_margin = Vector2(8, 8)
+resize_margin_offset_children = false
 
 [node name="Flow" type="Container" parent="PanelContainer2"]
+custom_minimum_size = Vector2(0, 196)
 layout_mode = 2
 script = ExtResource("1_2xacy")
 easing_factor = 0.2
@@ -78,8 +83,12 @@ offset_right = 1191.0
 offset_bottom = 696.0
 rotation = -0.261799
 scale = Vector2(0.698482, 0.698482)
+script = ExtResource("1_huoov")
+resize_margin = Vector2(8, 8)
+resize_margin_offset_children = false
 
 [node name="Flow" type="Container" parent="PanelContainer"]
+custom_minimum_size = Vector2(0, 166.54)
 layout_mode = 2
 script = ExtResource("1_2xacy")
 alignment = 1
@@ -120,8 +129,12 @@ offset_right = 609.0
 offset_bottom = 623.0
 rotation = 0.251256
 scale = Vector2(1.05672, 0.660246)
+script = ExtResource("1_huoov")
+resize_margin = Vector2(8, 8)
+resize_margin_offset_children = false
 
 [node name="Flow" type="Container" parent="PanelContainer3"]
+custom_minimum_size = Vector2(0, 166.54)
 layout_mode = 2
 script = ExtResource("1_2xacy")
 alignment = 2

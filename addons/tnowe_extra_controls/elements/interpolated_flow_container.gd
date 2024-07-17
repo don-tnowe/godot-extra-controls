@@ -10,6 +10,7 @@ enum ItemAlignment {
 	END,
 }
 
+## Alignment of the items
 @export var alignment : ItemAlignment:
 	set(v):
 		alignment = v
@@ -29,17 +30,7 @@ var _children_sizes_start : Array[Vector2]= []
 var _children_sizes_end : Array[Vector2]= []
 var _interp_progress_factor := 0.0
 var _dragging_node : Control
-
-
-func start_drag(of_node : Control):
-	_dragging_node
-	set_process_input(true)
-
-
-func end_drag():
-	_children_xforms_start[_dragging_node.get_index()].origin = _dragging_node.global_position - _dragging_node.get_global_transform().basis_xform(_dragging_node.size)
-	_dragging_node = null
-	set_process_input(false)
+var _skip_next_reorder := false
 
 
 func parent_queue_sort():
@@ -51,8 +42,10 @@ func parent_queue_sort():
 
 func _process(delta : float):
 	if move_time == 0.0:
+		set_process(false)
 		return
 
+	_skip_next_reorder = false
 	_interp_progress_factor += 1.0 / move_time * delta
 	var progress_eased := ease(_interp_progress_factor, easing_factor)
 	var children := get_children()
@@ -71,27 +64,17 @@ func _process(delta : float):
 		set_process(false)
 
 
-func _input(event : InputEvent):
-	if event is InputEventMouseButton && !event.pressed:
-		end_drag()
-
-
-func _get_minimum_size():
-	var found_minsize := 0.0
-	for x in get_children():
-		if !(x is Control && x.visible): continue
-		var x_minsize : Vector2 = x.get_combined_minimum_size()
-		found_minsize = maxf(found_minsize, x_minsize.x)
-
-	return Vector2(found_minsize, _total_row_height)
-
-
 func _notification(what : int):
 	if what == NOTIFICATION_SORT_CHILDREN:
 		_sort_children()
 
 
 func _sort_children():
+	if _skip_next_reorder:
+		# Skip sort if custom_minimum_size changed when sorting children.
+		# Prevents animation from not playing. _skip_next_reorder is reset next _process()
+		return
+
 	var child_count := get_child_count()
 	_children_xforms_start.resize(child_count)
 	_children_sizes_start.resize(child_count)
@@ -105,17 +88,18 @@ func _sort_children():
 	var cur_row_height := 0.0
 	var cur_row_expand_count := 0
 	var children_in_row := 0
-	var cur_minsize := Vector2.ZERO
+	var cur_child_minsize := Vector2.ZERO
+	var largest_child := 0.0
 	for x in get_children():
 		if !(x is Control && x.visible):
 			continue
 
 		var cur_child : Control = x
-		cur_minsize = cur_child.get_combined_minimum_size()
-		cur_row_width += cur_minsize.x
+		cur_child_minsize = cur_child.get_combined_minimum_size()
+		cur_row_width += cur_child_minsize.x
 		if cur_row_width > size.x:
 			cur_row += 1
-			cur_row_width -= cur_minsize.x
+			cur_row_width -= cur_child_minsize.x
 			_row_start_child_index.resize(cur_row + 1)
 			_row_start_child_index[cur_row] = x.get_index()
 
@@ -128,13 +112,14 @@ func _sort_children():
 			)
 			cur_row_top_offset += cur_row_height + _separation.y
 			cur_row_height = 0.0
-			cur_row_width = cur_minsize.x - _separation.x
+			cur_row_width = cur_child_minsize.x - _separation.x
 			cur_row_expand_count = 0
 			children_in_row = 0
 
 		children_in_row += 1
 		cur_row_width += _separation.x
-		cur_row_height = maxf(cur_row_height, cur_minsize.y)
+		cur_row_height = maxf(cur_row_height, cur_child_minsize.y)
+		largest_child = maxf(largest_child, cur_child_minsize.x)
 		if cur_child.size_flags_horizontal & SIZE_EXPAND != 0:
 			cur_row_expand_count += 1
 
@@ -149,6 +134,8 @@ func _sort_children():
 
 	_total_row_height = cur_row_top_offset + (cur_row_height if children_in_row > 0 else 0.0)
 	_interp_progress_factor = 0.0
+	_skip_next_reorder = true
+	custom_minimum_size = Vector2(largest_child, _total_row_height)
 	set_process(true)
 
 
@@ -161,6 +148,7 @@ func _fit_children_row(start_child : int, end_child : int, row_top_offset : floa
 		if alignment == ItemAlignment.END:
 			cur_offset += size.x - row_size.x
 
+	_interp_progress_factor = 0.0
 	for i in end_child - start_child:
 		var child_index := start_child + i
 		var child_testing := get_child(child_index)
