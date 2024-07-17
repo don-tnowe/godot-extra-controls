@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://dalf3ei7chg62"]
+[gd_scene load_steps=5 format=3 uid="uid://dalf3ei7chg62"]
 
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/interpolated_flow_container.gd" id="1_2xacy"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/draggable.gd" id="1_huoov"]
+[ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/interpolated_box_container.gd" id="3_w4jrf"]
 
 [sub_resource type="GDScript" id="GDScript_vfo4w"]
 script/source = "extends Node
@@ -43,14 +44,14 @@ metadata/_edit_lock_ = true
 [node name="PanelContainer2" type="PanelContainer" parent="."]
 offset_left = 32.0
 offset_top = 12.0
-offset_right = 680.0
+offset_right = 365.0
 offset_bottom = 308.0
 script = ExtResource("1_huoov")
 resize_margin = Vector2(8, 8)
 resize_margin_offset_children = false
 
 [node name="Flow" type="Container" parent="PanelContainer2"]
-custom_minimum_size = Vector2(0, 196)
+custom_minimum_size = Vector2(254.12, 296)
 layout_mode = 2
 script = ExtResource("1_2xacy")
 easing_factor = 0.2
@@ -77,10 +78,10 @@ custom_minimum_size = Vector2(64, 96)
 layout_mode = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
-offset_left = 694.0
-offset_top = 389.0
-offset_right = 1191.0
-offset_bottom = 696.0
+offset_left = 672.0
+offset_top = 383.0
+offset_right = 988.0
+offset_bottom = 761.0
 rotation = -0.261799
 scale = Vector2(0.698482, 0.698482)
 script = ExtResource("1_huoov")
@@ -88,7 +89,7 @@ resize_margin = Vector2(8, 8)
 resize_margin_offset_children = false
 
 [node name="Flow" type="Container" parent="PanelContainer"]
-custom_minimum_size = Vector2(0, 166.54)
+custom_minimum_size = Vector2(128.56, 196)
 layout_mode = 2
 script = ExtResource("1_2xacy")
 alignment = 1
@@ -123,10 +124,10 @@ layout_mode = 2
 size_flags_vertical = 4
 
 [node name="PanelContainer3" type="PanelContainer" parent="."]
-offset_left = 112.0
-offset_top = 316.0
-offset_right = 609.0
-offset_bottom = 623.0
+offset_left = 63.0
+offset_top = 336.0
+offset_right = 511.0
+offset_bottom = 584.0
 rotation = 0.251256
 scale = Vector2(1.05672, 0.660246)
 script = ExtResource("1_huoov")
@@ -134,7 +135,7 @@ resize_margin = Vector2(8, 8)
 resize_margin_offset_children = false
 
 [node name="Flow" type="Container" parent="PanelContainer3"]
-custom_minimum_size = Vector2(0, 166.54)
+custom_minimum_size = Vector2(128.56, 166.54)
 layout_mode = 2
 script = ExtResource("1_2xacy")
 alignment = 2
@@ -167,3 +168,84 @@ layout_mode = 2
 custom_minimum_size = Vector2(128.56, 66.54)
 layout_mode = 2
 size_flags_vertical = 4
+
+[node name="PanelContainer4" type="PanelContainer" parent="."]
+offset_left = 471.0
+offset_top = 48.0
+offset_right = 923.0
+offset_bottom = 112.0
+script = ExtResource("1_huoov")
+resize_margin = Vector2(8, 0)
+
+[node name="InterpolatedBoxContainer" type="Container" parent="PanelContainer4"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+script = ExtResource("3_w4jrf")
+alignment = 1
+easing_factor = 0.2
+
+[node name="Button" type="Button" parent="PanelContainer4/InterpolatedBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+text = "1"
+
+[node name="Button2" type="Button" parent="PanelContainer4/InterpolatedBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+text = "2"
+
+[node name="Button3" type="Button" parent="PanelContainer4/InterpolatedBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+text = "3"
+
+[node name="Button4" type="Button" parent="PanelContainer4/InterpolatedBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+text = "4"
+
+[node name="Button8" type="Button" parent="PanelContainer4/InterpolatedBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+text = "5"
+
+[node name="PanelContainer5" type="PanelContainer" parent="."]
+offset_left = 1003.0
+offset_top = 47.0
+offset_right = 1067.0
+offset_bottom = 452.0
+script = ExtResource("1_huoov")
+resize_margin = Vector2(0, 8)
+
+[node name="InterpolatedBoxContainer" type="Container" parent="PanelContainer5"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+script = ExtResource("3_w4jrf")
+alignment = 1
+easing_factor = 0.2
+vertical = true
+
+[node name="Button" type="Button" parent="PanelContainer5/InterpolatedBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+text = "1"
+
+[node name="Button2" type="Button" parent="PanelContainer5/InterpolatedBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+text = "2"
+
+[node name="Button3" type="Button" parent="PanelContainer5/InterpolatedBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+text = "3"
+
+[node name="Button4" type="Button" parent="PanelContainer5/InterpolatedBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+text = "4"
+
+[node name="Button8" type="Button" parent="PanelContainer5/InterpolatedBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+text = "5"

@@ -3,6 +3,9 @@ class_name InterpolatedFlowContainer
 extends Container
 
 ## A container that displays children in a row, wrapping overflow around or squishing them to fit width, with an additional smooth repositioning feature.
+##
+## Handles children with the Expand size flag. [br]
+## Control spacing by setting the theme's FlowContainer constants.
 
 enum ItemAlignment {
 	BEGIN,
@@ -29,7 +32,6 @@ var _children_xforms_end : Array[Transform2D] = []
 var _children_sizes_start : Array[Vector2]= []
 var _children_sizes_end : Array[Vector2]= []
 var _interp_progress_factor := 0.0
-var _dragging_node : Control
 var _skip_next_reorder := false
 
 
@@ -50,9 +52,6 @@ func _process(delta : float):
 	var progress_eased := ease(_interp_progress_factor, easing_factor)
 	var children := get_children()
 	for i in children.size():
-		if !(children[i] is Control && children[i] != _dragging_node):
-			continue
-
 		var cur_child : Control = children[i]
 		var child_xform := _children_xforms_start[i].interpolate_with(_children_xforms_end[i], progress_eased)
 		cur_child.size = _children_sizes_start[i].lerp(_children_sizes_end[i], progress_eased)
