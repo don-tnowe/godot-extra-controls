@@ -130,6 +130,7 @@ func _gui_input(event : InputEvent):
 			if _mouse_dragging_direction.y != 0:
 				_size_buffered.y += event.relative.y * _mouse_dragging_direction.y
 
+			event.relative = get_transform().basis_xform(event.relative)
 			if (is_diagonal || _mouse_dragging_direction.x == 0) && _mouse_dragging_direction.y <= 0 && _size_buffered.y >= get_combined_minimum_size().y:
 				position.y += event.relative.y
 
