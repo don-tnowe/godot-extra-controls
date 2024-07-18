@@ -172,6 +172,7 @@ grow_vertical = 2
 mouse_filter = 0
 mouse_force_pass_scroll_events = false
 script = ExtResource("1_pmqwv")
+child_size = Vector2(768, 576)
 
 [node name="Control" type="ColorRect" parent="Control/ScrollZoomViewDemo/ScrollZoomView"]
 layout_mode = 2

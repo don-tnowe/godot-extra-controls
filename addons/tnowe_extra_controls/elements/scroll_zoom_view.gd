@@ -2,10 +2,18 @@
 class_name ScrollZoomView
 extends MarginContainer
 
-## A container that offsets resizes its child control when panned with mouse button or the scroll wheel is used.
+## A container that offsets and/or smoothly resizes its child control when panned with mouse pointer, or the scroll wheel is used.
 
 ## The mouse buttons that will scroll through the view when panning.
 @export_flags("Left", "Right", "Middle", "Back:128", "Forward:256") var pan_button := 7
+## The size of the child if [member zoom_amount] is 1.0. Set to negative to make it inherit this node's size.
+@export var child_size := Vector2(-1.0, -1.0):
+	set(v):
+		child_size = v
+		if !is_inside_tree(): await ready
+		var child := get_child(0)
+		child.size.x = v.x if v.x >= 0.0 else size.x
+		child.size.y = v.y if v.y >= 0.0 else size.y
 ## The minimum and maximum zoom amount.
 @export var zoom_range := Vector2(0.125, 8.0)
 ## The smallest dragging distance to be considered a valid panning gesture, in pixels.
@@ -16,6 +24,7 @@ extends MarginContainer
 ## Set to 0 to prevent zoom. Set to 1 to make it instant.
 @export_range(0.0, 1.0) var zoom_interp_speed := 0.25
 
+@export_group("State")
 ## The current zoom amount. If set at runtime, will interpolate smoothly using [member zoom_interp_speed].
 @export var zoom_amount := 1.0:
 	set(v):
@@ -27,6 +36,7 @@ extends MarginContainer
 		scroll_offset = v
 		if !is_inside_tree(): await ready
 		get_child(0).position = v
+
 
 var _input_dragging := false
 var _input_drag_start := Vector2()
