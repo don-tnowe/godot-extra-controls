@@ -130,13 +130,14 @@ func _gui_input(event : InputEvent):
 			if _mouse_dragging_direction.y != 0:
 				_size_buffered.y += event.relative.y * _mouse_dragging_direction.y
 
-			event.relative = get_transform().basis_xform(event.relative)
+			var pos_change := Vector2.ZERO
 			if (is_diagonal || _mouse_dragging_direction.x == 0) && _mouse_dragging_direction.y <= 0 && _size_buffered.y >= get_combined_minimum_size().y:
-				position.y += event.relative.y
+				pos_change.y = event.relative.y
 
 			if (is_diagonal || _mouse_dragging_direction.y == 0) && _mouse_dragging_direction.x <= 0 && _size_buffered.x >= get_combined_minimum_size().x:
-				position.x += event.relative.x
+				pos_change.x = event.relative.x
 
+			position += get_transform().basis_xform(pos_change)
 			size = _size_buffered
 			queue_redraw()
 

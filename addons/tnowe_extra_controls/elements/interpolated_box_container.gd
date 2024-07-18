@@ -308,9 +308,7 @@ func _child_gui_input(event : InputEvent, child : Control):
 
 func _input(event : InputEvent):
 	if event is InputEventMouseMotion && _dragging_node != null:
-		var dragging_xform := _dragging_node.get_global_transform()
-		# basis_xform_inv() inverts the scale component, this means it needs to be un-applied twice.
-		_dragging_node.position += dragging_xform.basis_xform_inv(event.relative) / dragging_xform.get_scale() / dragging_xform.get_scale()
+		_dragging_node.global_position += event.relative
 		_insert_child_at_position(_dragging_node)
 		if allow_drag_transfer && !Rect2(Vector2.ZERO, size).has_point(get_global_transform().affine_inverse() * event.global_position):
 			_insert_child_in_other(_dragging_node, event.global_position)
