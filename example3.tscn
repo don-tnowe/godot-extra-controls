@@ -58,30 +58,35 @@ easing_factor = 0.2
 metadata/_edit_lock_ = true
 
 [node name="Button2" type="Button" parent="PanelContainer2/Flow"]
+self_modulate = Color(1, 0.501961, 0.501961, 1)
 custom_minimum_size = Vector2(64, 96)
 layout_mode = 2
 
 [node name="Button11" type="Button" parent="PanelContainer2/Flow"]
+self_modulate = Color(1, 0.501961, 0.501961, 1)
 custom_minimum_size = Vector2(93.48, 96)
 layout_mode = 2
 
 [node name="Button5" type="Button" parent="PanelContainer2/Flow"]
+self_modulate = Color(1, 0.501961, 0.501961, 1)
 custom_minimum_size = Vector2(241.16, 96)
 layout_mode = 2
 
 [node name="Button10" type="Button" parent="PanelContainer2/Flow"]
+self_modulate = Color(1, 0.501961, 0.501961, 1)
 custom_minimum_size = Vector2(254.12, 96)
 layout_mode = 2
 
 [node name="Button9" type="Button" parent="PanelContainer2/Flow"]
+self_modulate = Color(1, 0.501961, 0.501961, 1)
 custom_minimum_size = Vector2(64, 96)
 layout_mode = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
-offset_left = 672.0
-offset_top = 383.0
-offset_right = 988.0
-offset_bottom = 761.0
+offset_left = 596.0
+offset_top = 376.0
+offset_right = 912.0
+offset_bottom = 754.0
 rotation = -0.261799
 scale = Vector2(0.698482, 0.698482)
 script = ExtResource("1_huoov")
@@ -97,28 +102,34 @@ easing_factor = 0.2
 metadata/_edit_lock_ = true
 
 [node name="Button3" type="Button" parent="PanelContainer/Flow"]
+self_modulate = Color(0.866667, 0.694118, 1, 1)
 custom_minimum_size = Vector2(128.56, 39.82)
 layout_mode = 2
 size_flags_vertical = 4
 
 [node name="Button" type="Button" parent="PanelContainer/Flow"]
+self_modulate = Color(0.866667, 0.694118, 1, 1)
 custom_minimum_size = Vector2(93.48, 66.54)
 layout_mode = 2
 size_flags_vertical = 4
 
 [node name="Button6" type="Button" parent="PanelContainer/Flow"]
+self_modulate = Color(0.866667, 0.694118, 1, 1)
 custom_minimum_size = Vector2(64, 96)
 layout_mode = 2
 
 [node name="Button8" type="Button" parent="PanelContainer/Flow"]
+self_modulate = Color(0.866667, 0.694118, 1, 1)
 custom_minimum_size = Vector2(64, 96)
 layout_mode = 2
 
 [node name="Button4" type="Button" parent="PanelContainer/Flow"]
+self_modulate = Color(0.866667, 0.694118, 1, 1)
 custom_minimum_size = Vector2(36.5, 96)
 layout_mode = 2
 
 [node name="Button7" type="Button" parent="PanelContainer/Flow"]
+self_modulate = Color(0.866667, 0.694118, 1, 1)
 custom_minimum_size = Vector2(128.56, 66.54)
 layout_mode = 2
 size_flags_vertical = 4
@@ -143,37 +154,43 @@ easing_factor = 0.2
 metadata/_edit_lock_ = true
 
 [node name="Button3" type="Button" parent="PanelContainer3/Flow"]
+self_modulate = Color(0.619608, 1, 0.772549, 1)
 custom_minimum_size = Vector2(128.56, 39.82)
 layout_mode = 2
 size_flags_vertical = 4
 
 [node name="Button" type="Button" parent="PanelContainer3/Flow"]
+self_modulate = Color(0.619608, 1, 0.772549, 1)
 custom_minimum_size = Vector2(93.48, 66.54)
 layout_mode = 2
 size_flags_vertical = 4
 
 [node name="Button6" type="Button" parent="PanelContainer3/Flow"]
+self_modulate = Color(0.619608, 1, 0.772549, 1)
 custom_minimum_size = Vector2(64, 96)
 layout_mode = 2
 
 [node name="Button8" type="Button" parent="PanelContainer3/Flow"]
+self_modulate = Color(0.619608, 1, 0.772549, 1)
 custom_minimum_size = Vector2(64, 96)
 layout_mode = 2
 
 [node name="Button4" type="Button" parent="PanelContainer3/Flow"]
+self_modulate = Color(0.619608, 1, 0.772549, 1)
 custom_minimum_size = Vector2(36.5, 96)
 layout_mode = 2
 
 [node name="Button7" type="Button" parent="PanelContainer3/Flow"]
+self_modulate = Color(0.619608, 1, 0.772549, 1)
 custom_minimum_size = Vector2(128.56, 66.54)
 layout_mode = 2
 size_flags_vertical = 4
 
 [node name="PanelContainer4" type="PanelContainer" parent="."]
-offset_left = 471.0
-offset_top = 48.0
-offset_right = 923.0
-offset_bottom = 112.0
+offset_left = 476.0
+offset_top = 72.0
+offset_right = 928.0
+offset_bottom = 136.0
 script = ExtResource("1_huoov")
 resize_margin = Vector2(8, 0)
 
@@ -181,39 +198,98 @@ resize_margin = Vector2(8, 0)
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 script = ExtResource("3_w4jrf")
-alignment = 1
 easing_factor = 0.2
+allow_drag_transfer = true
+allow_drag_insert = true
+drag_insert_condition = "get_class() == \"Button\" and text.find(\"|\") == -1"
+drag_insert_call_on_success = "print(\"Inserted! \", text)"
 
 [node name="Button" type="Button" parent="PanelContainer4/InterpolatedBoxContainer"]
+self_modulate = Color(0.776471, 0.945098, 1, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 text = "1"
 
 [node name="Button2" type="Button" parent="PanelContainer4/InterpolatedBoxContainer"]
+self_modulate = Color(0.776471, 0.945098, 1, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 text = "2"
 
 [node name="Button3" type="Button" parent="PanelContainer4/InterpolatedBoxContainer"]
+self_modulate = Color(0.776471, 0.945098, 1, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
-text = "3"
+text = "3-"
 
 [node name="Button4" type="Button" parent="PanelContainer4/InterpolatedBoxContainer"]
+self_modulate = Color(0.776471, 0.945098, 1, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 text = "4"
 
 [node name="Button8" type="Button" parent="PanelContainer4/InterpolatedBoxContainer"]
+self_modulate = Color(0.776471, 0.945098, 1, 1)
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+text = "5-"
+
+[node name="PanelContainer6" type="PanelContainer" parent="."]
+offset_left = 525.0
+offset_top = 155.0
+offset_right = 977.0
+offset_bottom = 219.0
+rotation = 0.261799
+script = ExtResource("1_huoov")
+resize_margin = Vector2(8, 0)
+
+[node name="InterpolatedBoxContainer" type="Container" parent="PanelContainer6"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+script = ExtResource("3_w4jrf")
+alignment = 2
+easing_factor = 0.2
+allow_drag_transfer = true
+allow_drag_insert = true
+drag_insert_condition = "get_class() == \"Button\""
+drag_insert_call_on_success = "print(\"Inserted! \", text)"
+
+[node name="Button" type="Button" parent="PanelContainer6/InterpolatedBoxContainer"]
+self_modulate = Color(1, 0.776471, 0.992157, 1)
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+text = "1"
+
+[node name="Button2" type="Button" parent="PanelContainer6/InterpolatedBoxContainer"]
+self_modulate = Color(1, 0.776471, 0.992157, 1)
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+text = "2"
+
+[node name="Button3" type="Button" parent="PanelContainer6/InterpolatedBoxContainer"]
+self_modulate = Color(1, 0.776471, 0.992157, 1)
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+text = "3"
+
+[node name="Button4" type="Button" parent="PanelContainer6/InterpolatedBoxContainer"]
+self_modulate = Color(1, 0.776471, 0.992157, 1)
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+text = "4"
+
+[node name="Button8" type="Button" parent="PanelContainer6/InterpolatedBoxContainer"]
+self_modulate = Color(1, 0.776471, 0.992157, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 text = "5"
 
 [node name="PanelContainer5" type="PanelContainer" parent="."]
-offset_left = 1003.0
-offset_top = 47.0
-offset_right = 1067.0
-offset_bottom = 452.0
+offset_left = 982.0
+offset_top = 45.0
+offset_right = 1046.0
+offset_bottom = 450.0
+scale = Vector2(0.75, 0.75)
 script = ExtResource("1_huoov")
 resize_margin = Vector2(0, 8)
 
@@ -224,28 +300,46 @@ script = ExtResource("3_w4jrf")
 alignment = 1
 easing_factor = 0.2
 vertical = true
+allow_drag_transfer = true
+allow_drag_insert = true
+drag_insert_condition = "get_class() == \"Button\" and text.find(\"-\") == -1"
+drag_insert_call_on_success = "print(\"Inserted! \", text)"
 
 [node name="Button" type="Button" parent="PanelContainer5/InterpolatedBoxContainer"]
+self_modulate = Color(1, 0.894118, 0.513726, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
-text = "1"
+text = "1|"
 
 [node name="Button2" type="Button" parent="PanelContainer5/InterpolatedBoxContainer"]
+self_modulate = Color(1, 0.894118, 0.513726, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 text = "2"
 
 [node name="Button3" type="Button" parent="PanelContainer5/InterpolatedBoxContainer"]
+self_modulate = Color(1, 0.894118, 0.513726, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 text = "3"
 
 [node name="Button4" type="Button" parent="PanelContainer5/InterpolatedBoxContainer"]
+self_modulate = Color(1, 0.894118, 0.513726, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
-text = "4"
+text = "4|"
 
 [node name="Button8" type="Button" parent="PanelContainer5/InterpolatedBoxContainer"]
+self_modulate = Color(1, 0.894118, 0.513726, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 text = "5"
+
+[node name="Label" type="Label" parent="."]
+offset_left = 540.0
+offset_top = 13.0
+offset_right = 869.0
+offset_bottom = 36.0
+text = "Drag and drop between box containers!
+Containers have insert conditions."
+horizontal_alignment = 1

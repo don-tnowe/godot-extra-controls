@@ -38,6 +38,31 @@ enum ItemAlignment {
 		queue_sort()
 ## Enable reordering by using the mouse pointer.
 @export var allow_drag_reorder := true
+## Enable dragging children to be placed in other InterpolatedBoxContainers, by using the mouse pointer.
+@export var allow_drag_transfer := false
+## Enable nodes to be placed here from other InterpolatedBoxContainers, by using the mouse pointer.
+@export var allow_drag_insert := false:
+	set(v):
+		allow_drag_insert = v
+		if v: _all_boxes.append(self)
+		else: _all_boxes.erase(self)
+## Expression to test for [member allow_drag_insert] to know if a node can be inserted, executed on the node. If [code]true[/code], the node will be inserted.[br]
+## The [code]from[/code] parameter will be a reference to the node it's dragged from, and [code]into[/code] will be this node. [br][br]
+## For example, expression [code](get_class() == "Button" and into.has_method(&"insert_button_node"))[/code] tests if the dragged node is [code]Button[/code] and the destination has method[code]insert_button_node[/code]. [br][br]
+## [b]Note: [/b] Some operators are unsopported in expressions, such as [code]is[/code] and ternary [code]if[/code]. Consider calling node's script methods after checking [code]has_method[/code].
+@export var drag_insert_condition := "":
+	set(v):
+		drag_insert_condition = v
+		if v.is_empty():
+			_drag_insert_condition_exp = null
+
+		else:
+			_drag_insert_condition_exp = Expression.new()
+			_drag_insert_condition_exp.parse(v, ["from", "into"])
+## Expression to execute on the node after insertion succeeds. Same parameters as [member drag_insert_condition].
+@export var drag_insert_call_on_success := ""
+
+static var _all_boxes : Array[InterpolatedBoxContainer] = []
 
 var _separation := 0.0
 var _dragging_node : Control
@@ -48,6 +73,7 @@ var _children_sizes_start : Array[Vector2] = []
 var _children_sizes_end : Array[Vector2] = []
 var _interp_progress_factor := 0.0
 var _skip_next_reorder := false
+var _drag_insert_condition_exp : Expression
 
 
 func parent_queue_sort():
@@ -60,6 +86,12 @@ func parent_queue_sort():
 func _enter_tree():
 	child_entered_tree.connect(_on_child_entered_tree)
 	child_exiting_tree.connect(_on_child_exiting_tree)
+	set_process_input(false)
+
+
+func _exit_tree():
+	child_entered_tree.disconnect(_on_child_entered_tree)
+	child_exiting_tree.disconnect(_on_child_exiting_tree)
 
 
 func _process(delta : float):
@@ -234,6 +266,27 @@ func _insert_child_at_position(child : Control):
 	move_child(child, children.size())
 
 
+func _insert_child_in_other(child : Control, mouse_global_position : Vector2):
+	for x in _all_boxes:
+		if !x.allow_drag_insert || !Rect2(Vector2.ZERO, x.size).has_point(x.get_global_transform().affine_inverse() * mouse_global_position):
+			continue
+
+		if x._drag_insert_condition_exp.execute([self, x], child) != true:
+			continue
+
+		child.reparent(x)
+		x._dragging_node = child
+		x.set_process_input(true)
+		set_process_input(false)
+		if !drag_insert_call_on_success.is_empty():
+			# Can be compiled on the spot - not called as often.
+			var success_expr := Expression.new()
+			success_expr.parse(drag_insert_call_on_success)
+			success_expr.execute([self, x], child)
+
+		break
+
+
 func _on_child_entered_tree(x : Node):
 	if x is Control:
 		x.gui_input.connect(_child_gui_input.bind(x))
@@ -248,14 +301,21 @@ func _child_gui_input(event : InputEvent, child : Control):
 	if !allow_drag_reorder:
 		return
 
-	if event is InputEventMouseButton && event.button_index == MOUSE_BUTTON_LEFT:
-		if event.pressed:
-			_dragging_node = child
+	if event is InputEventMouseButton && event.button_index == MOUSE_BUTTON_LEFT && event.pressed:
+		_dragging_node = child
+		set_process_input(true)
 
-		elif _dragging_node == child:
-			_dragging_node = null
-			queue_sort()
 
-	if event is InputEventMouseMotion && _dragging_node == child:
-		child.position += child.get_transform().basis_xform(event.relative)
-		_insert_child_at_position(child)
+func _input(event : InputEvent):
+	if event is InputEventMouseMotion && _dragging_node != null:
+		var dragging_xform := _dragging_node.get_global_transform()
+		# basis_xform_inv() inverts the scale component, this means it needs to be un-applied twice.
+		_dragging_node.position += dragging_xform.basis_xform_inv(event.relative) / dragging_xform.get_scale() / dragging_xform.get_scale()
+		_insert_child_at_position(_dragging_node)
+		if allow_drag_transfer && !Rect2(Vector2.ZERO, size).has_point(get_global_transform().affine_inverse() * event.global_position):
+			_insert_child_in_other(_dragging_node, event.global_position)
+
+	if event is InputEventMouseButton && event.button_index == MOUSE_BUTTON_LEFT && !event.pressed:
+		_dragging_node = null
+		queue_sort()
+		set_process_input(false)
