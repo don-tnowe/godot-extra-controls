@@ -1,44 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://dalf3ei7chg62"]
+[gd_scene load_steps=4 format=3 uid="uid://dalf3ei7chg62"]
 
-[ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/interpolated_flow_container.gd" id="1_2xacy"]
+[ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/interpolated_container/interpolated_flow_container.gd" id="1_2xacy"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/draggable.gd" id="1_huoov"]
-[ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/interpolated_box_container.gd" id="3_w4jrf"]
-
-[sub_resource type="GDScript" id="GDScript_vfo4w"]
-script/source = "extends Node
-
-func _ready():
-	for x in get_child(0).get_child(0).get_children():
-		x.pressed.connect(_on_pressed.bind(x))
-		x.text = str(randi() % 100)
-	for x in get_child(1).get_child(0).get_children():
-		x.pressed.connect(_on_pressed.bind(x))
-		x.text = str(randi() % 100 + 100)
-	for x in get_child(2).get_child(0).get_children():
-		x.pressed.connect(_on_pressed.bind(x))
-		x.text = str(randi() % 100 + 200)
-
-
-func _on_pressed(item : Control):
-	var target : Control
-	if item.get_parent().get_parent().get_index() == 0:
-		target = get_child(1).get_child(0)
-
-	elif item.get_parent().get_parent().get_index() == 1:
-		target = get_child(2).get_child(0)
-
-	elif item.get_parent().get_parent().get_index() == 2:
-		target = get_child(0).get_child(0)
-
-	var item_xform := item.get_global_transform()
-	item.reparent(target)
-	item_xform = item.get_parent().get_global_transform().affine_inverse() * item_xform
-	item.rotation = item_xform.get_rotation()
-	item.scale = item_xform.get_scale()
-"
+[ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/interpolated_container/interpolated_box_container.gd" id="3_w4jrf"]
 
 [node name="Box" type="Node"]
-script = SubResource("GDScript_vfo4w")
 metadata/_edit_lock_ = true
 
 [node name="PanelContainer2" type="PanelContainer" parent="."]
@@ -55,32 +21,41 @@ custom_minimum_size = Vector2(254.12, 296)
 layout_mode = 2
 script = ExtResource("1_2xacy")
 easing_factor = 0.2
+allow_drag_transfer = true
+allow_drag_insert = true
+drag_insert_condition = "get_class() == \"Button\""
+drag_insert_call_on_success = "print(\"Inserted! \", text)"
 metadata/_edit_lock_ = true
 
 [node name="Button2" type="Button" parent="PanelContainer2/Flow"]
 self_modulate = Color(1, 0.501961, 0.501961, 1)
 custom_minimum_size = Vector2(64, 96)
 layout_mode = 2
+text = "1"
 
 [node name="Button11" type="Button" parent="PanelContainer2/Flow"]
 self_modulate = Color(1, 0.501961, 0.501961, 1)
 custom_minimum_size = Vector2(93.48, 96)
 layout_mode = 2
+text = "2"
 
 [node name="Button5" type="Button" parent="PanelContainer2/Flow"]
 self_modulate = Color(1, 0.501961, 0.501961, 1)
 custom_minimum_size = Vector2(241.16, 96)
 layout_mode = 2
+text = "3"
 
 [node name="Button10" type="Button" parent="PanelContainer2/Flow"]
 self_modulate = Color(1, 0.501961, 0.501961, 1)
 custom_minimum_size = Vector2(254.12, 96)
 layout_mode = 2
+text = "4"
 
 [node name="Button9" type="Button" parent="PanelContainer2/Flow"]
 self_modulate = Color(1, 0.501961, 0.501961, 1)
 custom_minimum_size = Vector2(64, 96)
 layout_mode = 2
+text = "5"
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 offset_left = 596.0
@@ -99,6 +74,10 @@ layout_mode = 2
 script = ExtResource("1_2xacy")
 alignment = 1
 easing_factor = 0.2
+allow_drag_transfer = true
+allow_drag_insert = true
+drag_insert_condition = "get_class() == \"Button\""
+drag_insert_call_on_success = "print(\"Inserted! \", text)"
 metadata/_edit_lock_ = true
 
 [node name="Button3" type="Button" parent="PanelContainer/Flow"]
@@ -106,33 +85,39 @@ self_modulate = Color(0.866667, 0.694118, 1, 1)
 custom_minimum_size = Vector2(128.56, 39.82)
 layout_mode = 2
 size_flags_vertical = 4
+text = "1"
 
 [node name="Button" type="Button" parent="PanelContainer/Flow"]
 self_modulate = Color(0.866667, 0.694118, 1, 1)
 custom_minimum_size = Vector2(93.48, 66.54)
 layout_mode = 2
 size_flags_vertical = 4
+text = "2"
 
 [node name="Button6" type="Button" parent="PanelContainer/Flow"]
 self_modulate = Color(0.866667, 0.694118, 1, 1)
 custom_minimum_size = Vector2(64, 96)
 layout_mode = 2
+text = "3"
 
 [node name="Button8" type="Button" parent="PanelContainer/Flow"]
 self_modulate = Color(0.866667, 0.694118, 1, 1)
 custom_minimum_size = Vector2(64, 96)
 layout_mode = 2
+text = "4"
 
 [node name="Button4" type="Button" parent="PanelContainer/Flow"]
 self_modulate = Color(0.866667, 0.694118, 1, 1)
 custom_minimum_size = Vector2(36.5, 96)
 layout_mode = 2
+text = "5"
 
 [node name="Button7" type="Button" parent="PanelContainer/Flow"]
 self_modulate = Color(0.866667, 0.694118, 1, 1)
 custom_minimum_size = Vector2(128.56, 66.54)
 layout_mode = 2
 size_flags_vertical = 4
+text = "6"
 
 [node name="PanelContainer3" type="PanelContainer" parent="."]
 offset_left = 63.0
@@ -151,6 +136,10 @@ layout_mode = 2
 script = ExtResource("1_2xacy")
 alignment = 2
 easing_factor = 0.2
+allow_drag_transfer = true
+allow_drag_insert = true
+drag_insert_condition = "get_class() == \"Button\""
+drag_insert_call_on_success = "print(\"Inserted! \", text)"
 metadata/_edit_lock_ = true
 
 [node name="Button3" type="Button" parent="PanelContainer3/Flow"]
@@ -158,33 +147,40 @@ self_modulate = Color(0.619608, 1, 0.772549, 1)
 custom_minimum_size = Vector2(128.56, 39.82)
 layout_mode = 2
 size_flags_vertical = 4
+text = "1"
 
 [node name="Button" type="Button" parent="PanelContainer3/Flow"]
 self_modulate = Color(0.619608, 1, 0.772549, 1)
 custom_minimum_size = Vector2(93.48, 66.54)
 layout_mode = 2
 size_flags_vertical = 4
+text = "2"
 
 [node name="Button6" type="Button" parent="PanelContainer3/Flow"]
 self_modulate = Color(0.619608, 1, 0.772549, 1)
 custom_minimum_size = Vector2(64, 96)
 layout_mode = 2
+size_flags_horizontal = 3
+text = "3="
 
 [node name="Button8" type="Button" parent="PanelContainer3/Flow"]
 self_modulate = Color(0.619608, 1, 0.772549, 1)
 custom_minimum_size = Vector2(64, 96)
 layout_mode = 2
+text = "4"
 
 [node name="Button4" type="Button" parent="PanelContainer3/Flow"]
 self_modulate = Color(0.619608, 1, 0.772549, 1)
 custom_minimum_size = Vector2(36.5, 96)
 layout_mode = 2
+text = "5"
 
 [node name="Button7" type="Button" parent="PanelContainer3/Flow"]
 self_modulate = Color(0.619608, 1, 0.772549, 1)
 custom_minimum_size = Vector2(128.56, 66.54)
 layout_mode = 2
 size_flags_vertical = 4
+text = "6"
 
 [node name="PanelContainer4" type="PanelContainer" parent="."]
 offset_left = 476.0
@@ -208,30 +204,40 @@ drag_insert_call_on_success = "print(\"Inserted! \", text)"
 self_modulate = Color(0.776471, 0.945098, 1, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 text = "1"
 
 [node name="Button2" type="Button" parent="PanelContainer4/InterpolatedBoxContainer"]
 self_modulate = Color(0.776471, 0.945098, 1, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 text = "2"
 
 [node name="Button3" type="Button" parent="PanelContainer4/InterpolatedBoxContainer"]
 self_modulate = Color(0.776471, 0.945098, 1, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 text = "3-"
 
 [node name="Button4" type="Button" parent="PanelContainer4/InterpolatedBoxContainer"]
 self_modulate = Color(0.776471, 0.945098, 1, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 text = "4"
 
 [node name="Button8" type="Button" parent="PanelContainer4/InterpolatedBoxContainer"]
 self_modulate = Color(0.776471, 0.945098, 1, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 text = "5-"
 
 [node name="PanelContainer6" type="PanelContainer" parent="."]
@@ -258,30 +264,40 @@ drag_insert_call_on_success = "print(\"Inserted! \", text)"
 self_modulate = Color(1, 0.776471, 0.992157, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 text = "1"
 
 [node name="Button2" type="Button" parent="PanelContainer6/InterpolatedBoxContainer"]
 self_modulate = Color(1, 0.776471, 0.992157, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 text = "2"
 
 [node name="Button3" type="Button" parent="PanelContainer6/InterpolatedBoxContainer"]
 self_modulate = Color(1, 0.776471, 0.992157, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 text = "3"
 
 [node name="Button4" type="Button" parent="PanelContainer6/InterpolatedBoxContainer"]
 self_modulate = Color(1, 0.776471, 0.992157, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 text = "4"
 
 [node name="Button8" type="Button" parent="PanelContainer6/InterpolatedBoxContainer"]
 self_modulate = Color(1, 0.776471, 0.992157, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 text = "5"
 
 [node name="PanelContainer5" type="PanelContainer" parent="."]
@@ -297,9 +313,9 @@ resize_margin = Vector2(0, 8)
 custom_minimum_size = Vector2(64, 0)
 layout_mode = 2
 script = ExtResource("3_w4jrf")
+vertical = true
 alignment = 1
 easing_factor = 0.2
-vertical = true
 allow_drag_transfer = true
 allow_drag_insert = true
 drag_insert_condition = "get_class() == \"Button\" and text.find(\"-\") == -1"
@@ -309,30 +325,40 @@ drag_insert_call_on_success = "print(\"Inserted! \", text)"
 self_modulate = Color(1, 0.894118, 0.513726, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 text = "1|"
 
 [node name="Button2" type="Button" parent="PanelContainer5/InterpolatedBoxContainer"]
 self_modulate = Color(1, 0.894118, 0.513726, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 text = "2"
 
 [node name="Button3" type="Button" parent="PanelContainer5/InterpolatedBoxContainer"]
 self_modulate = Color(1, 0.894118, 0.513726, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 text = "3"
 
 [node name="Button4" type="Button" parent="PanelContainer5/InterpolatedBoxContainer"]
 self_modulate = Color(1, 0.894118, 0.513726, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 text = "4|"
 
 [node name="Button8" type="Button" parent="PanelContainer5/InterpolatedBoxContainer"]
 self_modulate = Color(1, 0.894118, 0.513726, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 text = "5"
 
 [node name="Label" type="Label" parent="."]
