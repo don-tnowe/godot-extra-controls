@@ -33,6 +33,11 @@ extends Container
 	set(v):
 		minsize_from_children = v
 		parent_queue_sort()
+## If [member minsize_from_children] enabled, child scale and rotation applies to the min-size of this node.
+@export var minsize_from_child_xform := false:
+	set(v):
+		minsize_from_child_xform = v
+		parent_queue_sort()
 
 var child_rotation_xform := Transform2D.IDENTITY
 
@@ -42,13 +47,26 @@ func _get_minimum_size():
 		return Vector2.ZERO
 
 	var found_minsize = Vector2.ZERO
+
+	if !minsize_from_child_xform:
+		for x in get_children():
+			if !x is Control: continue
+			var x_cast : Control = x
+			var x_minsize := x_cast.get_combined_minimum_size()
+			found_minsize = Vector2(
+				maxf(found_minsize.x, x_minsize.x),
+				maxf(found_minsize.y, x_minsize.y),
+			)
+
+		return found_minsize
+
 	for x in get_children():
 		if !x is Control: continue
 		var x_cast : Control = x
-		var x_minsize := child_rotation_xform * x_cast.get_combined_minimum_size()
+		var x_minsize := (child_rotation_xform * Rect2(Vector2.ZERO, x_cast.get_combined_minimum_size() * child_scale)).size
 		found_minsize = Vector2(
-			max(found_minsize.x, x_minsize.x * child_scale.x),
-			max(found_minsize.y, x_minsize.y * child_scale.y),
+			maxf(found_minsize.x, x_minsize.x),
+			maxf(found_minsize.y, x_minsize.y),
 		)
 
 	return found_minsize
