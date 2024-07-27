@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://d2bii41ego0fp"]
+[gd_scene load_steps=15 format=3 uid="uid://d2bii41ego0fp"]
 
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/draggable.gd" id="1_eddsv"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/scroll_zoom_view.gd" id="1_pmqwv"]
@@ -8,6 +8,8 @@
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/scale_container.gd" id="4_c4kjh"]
 [ext_resource type="Texture2D" uid="uid://6lx2qwr7mkwg" path="res://icon.svg" id="4_yfgq0"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/max_size_container.gd" id="6_ri1pc"]
+[ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/radial_container_theme.gd" id="9_mu2b1"]
+[ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/radial_container.gd" id="10_i8nra"]
 
 [sub_resource type="GDScript" id="GDScript_43ggq"]
 script/source = "extends Control
@@ -29,6 +31,56 @@ func _ready():
   $\"PropertiesBox\".add_float(\"Slider!\", 0, 0, 200, 0.1)
   $\"PropertiesBox\".end_group()
 "
+
+[sub_resource type="GDScript" id="GDScript_thcdi"]
+script/source = "extends Control
+
+@export var radial_selected_scale := 1.2
+@export var radial_theme_active : RadialContainerTheme
+@export var radial_theme_inactive : RadialContainerTheme
+
+var item_index_prev_selected := -1
+
+func _ready():
+	var wheel := get_child(0)
+	for i in wheel.get_child_count():
+		wheel.set_theme_at(i, radial_theme_inactive)
+
+
+func _input(event : InputEvent):
+	if event is InputEventMouseMotion:
+		var wheel := get_child(0)
+		var item_index := -1
+		if wheel.is_inside_circle(event.global_position):
+			item_index = wheel.get_index_from_global_position(event.global_position)
+
+		if item_index_prev_selected == item_index:
+			return
+
+		if item_index_prev_selected != -1:
+			wheel.set_theme_tweened(item_index_prev_selected, radial_theme_inactive, 0.25, Tween.TRANS_CUBIC)
+
+		wheel.set_theme_tweened(item_index, radial_theme_active if item_index != -1 else radial_theme_inactive, 0.5, Tween.TRANS_ELASTIC)
+		item_index_prev_selected = item_index
+"
+
+[sub_resource type="Resource" id="Resource_fme07"]
+script = ExtResource("9_mu2b1")
+radius_factor_outer = 1.2
+radius_factor_inner = 0.25
+item_radius_factor = 0.5
+item_scale = Vector2(1.2, 1.2)
+color = Color(1, 1, 1, 1)
+texture = ExtResource("4_yfgq0")
+
+[sub_resource type="Resource" id="Resource_vglod"]
+script = ExtResource("9_mu2b1")
+radius_factor_outer = 1.0
+radius_factor_inner = 0.2
+item_radius_factor = 0.5
+item_scale = Vector2(1, 1)
+color = Color(0.807843, 0.635294, 1, 0.486275)
+texture = ExtResource("4_yfgq0")
 
 [node name="ScrollContainer" type="ScrollContainer"]
 clip_contents = false
@@ -236,3 +288,45 @@ metadata/_edit_group_ = true
 layout_mode = 2
 mouse_filter = 2
 color = Color(1, 0.792157, 0.254902, 1)
+
+[node name="RadialMenu" type="Control" parent="Control"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 663.0
+offset_top = 685.0
+offset_right = 663.0
+offset_bottom = 685.0
+script = SubResource("GDScript_thcdi")
+radial_theme_active = SubResource("Resource_fme07")
+radial_theme_inactive = SubResource("Resource_vglod")
+
+[node name="RadialContainer" type="Container" parent="Control/RadialMenu"]
+layout_mode = 0
+offset_left = 46.0
+offset_top = 22.0
+offset_right = 219.0
+offset_bottom = 242.0
+script = ExtResource("10_i8nra")
+progress_offset = 0.68
+
+[node name="Label" type="Label" parent="Control/RadialMenu/RadialContainer"]
+layout_mode = 2
+text = "0"
+
+[node name="Label2" type="Label" parent="Control/RadialMenu/RadialContainer"]
+layout_mode = 2
+text = "1"
+
+[node name="Label3" type="Button" parent="Control/RadialMenu/RadialContainer"]
+layout_mode = 2
+size_flags_stretch_ratio = 3.0
+text = "2"
+
+[node name="Label4" type="Label" parent="Control/RadialMenu/RadialContainer"]
+layout_mode = 2
+text = "3"
+
+[node name="Label5" type="Label" parent="Control/RadialMenu/RadialContainer"]
+layout_mode = 2
+size_flags_stretch_ratio = 1.5
+text = "4"

@@ -41,7 +41,8 @@ enum OutOfBoundsBehaviour {
 			v.changed.connect(_on_radial_theme_changed)
 
 		_on_radial_theme_changed()
-## [RadialContainerTheme] applied to each individual child. Color, textures and item positions are overriden entirely, while others are combined with [member radial_theme].
+## [RadialContainerTheme] applied to each individual child. Color, textures and item positions are overriden entirely, while others are combined with [member radial_theme]. [br]
+## Use [method set_theme_at] and [method set_theme_tweened] to change an item's theme and update visuals.
 @export var radial_theme_per : Array[RadialContainerTheme]:
 	set(v):
 		for x in radial_theme_per:
@@ -76,8 +77,8 @@ func get_index_from_angle(angle_degrees : float) -> int:
 func get_index_from_angle_degrees(angle_degrees : float) -> int:
 	return get_index_from_angle(deg_to_rad(angle_degrees))
 
-## Retrieves the item index from a direction.
-func get_index_from_direction(direction : Vector2):
+## Retrieves the item index from a direction relative to circle's center. Does not check if [method is_inside_circle].
+func get_index_from_direction(direction : Vector2) -> int:
 	var angle_progress := fposmod(direction.angle() / TAU - progress_offset + 0.5, 1.0)
 	for i in _child_stretch_sum_until.size() - 1:
 		if _child_stretch_sum_until[i + 1] > angle_progress:
@@ -85,7 +86,41 @@ func get_index_from_direction(direction : Vector2):
 
 	return 0
 
-## Set the [RadialContainerTheme] for a specific sector, updating all visuals.
+## Retrieves the item index from a position in global space. Does not check if [method is_inside_circle].
+func get_index_from_global_position(global_pos : Vector2) -> int:
+	var from_center_pos := -(get_global_transform().affine_inverse() * global_pos - size * 0.5)
+	var angle_progress := fposmod(from_center_pos.angle() / TAU - progress_offset + 0.5, 1.0)
+	for i in _child_stretch_sum_until.size() - 1:
+		if _child_stretch_sum_until[i + 1] > angle_progress:
+			return i
+
+	return 0
+
+## Returns [code]true[/code] if a position in global space is overlapping the visible circle or sector. [br]
+## "Bound" parameters specify if [member RadialContainerTheme.radius_factor_outer] and [member RadialContainerTheme.radius_factor_inner] should be considered. [br]
+## [code]use_specific_sector[/code] specifies whether the circle should use [member radial_theme_per] themes, or only operate on the shared, size-constrained radius.
+func is_inside_circle(global_pos : Vector2, inner_bound : bool = true, outer_bound : bool = true, use_specific_sector : bool = true) -> bool:
+	var from_center_pos := -(get_global_transform().affine_inverse() * global_pos - size * 0.5)
+	var dist_factor := from_center_pos.length() / minf(size.x, size.y) * 2.0
+	var selected_theme : RadialContainerTheme
+	if use_specific_sector:
+		selected_theme = get_index_with_oob(get_index_from_direction(from_center_pos), radial_theme_per, radial_theme_per_behaviour, null)
+		if selected_theme == null && radial_theme == null:
+			return !outer_bound || dist_factor <= 1.0
+
+	if radial_theme == null:
+		return (
+			(!outer_bound || dist_factor <= selected_theme.radius_factor_outer)
+			&& (!inner_bound || dist_factor >= selected_theme.radius_factor_inner)
+		)
+
+	return (
+		(!outer_bound || dist_factor <= selected_theme.radius_factor_outer * radial_theme.radius_factor_outer)
+		&& (!inner_bound || dist_factor >= selected_theme.radius_factor_inner * radial_theme.radius_factor_inner)
+	)
+
+
+## Set the [RadialContainerTheme] for a specific sector, updating all visuals and expanding the array of needed.
 func set_theme_at(index : int, new_theme : RadialContainerTheme):
 	if index >= radial_theme_per.size():
 		var new_themes := radial_theme_per.duplicate()
@@ -118,7 +153,7 @@ func set_theme_tweened(
 	radial_theme_per = radial_theme_per
 	return tween
 
-## Utility function to apply [enum OutOfBoundsBehaviour] to an array index.
+## Utility function to apply [enum OutOfBoundsBehaviour] to an array index, then retrieve the array's item.
 static func get_index_with_oob(index : int, array : Array, oob : OutOfBoundsBehaviour, default_if_empty = null):
 	var max_index := array.size()
 	if max_index < 1:
@@ -221,11 +256,17 @@ func _draw():
 
 		var start_rad := (progress_offset + _child_stretch_sum_until[i]) * TAU + border_angle_rad
 		var end_rad := (progress_offset + _child_stretch_sum_until[i + 1]) * TAU - border_angle_rad
-		if end_rad <= start_rad: continue
+		if end_rad <= start_rad:
+			var avg := (end_rad + start_rad) * 0.5
+			start_rad = avg
+			end_rad = avg
 
 		var start_rad_inner := (progress_offset + _child_stretch_sum_until[i]) * TAU + border_angle_rad_inner
 		var end_rad_inner := (progress_offset + _child_stretch_sum_until[i + 1]) * TAU - border_angle_rad_inner
-		if end_rad_inner <= start_rad_inner: continue
+		if end_rad_inner <= start_rad_inner:
+			var avg := (end_rad_inner + start_rad_inner) * 0.5
+			start_rad_inner = avg
+			end_rad_inner = avg
 
 		var sector_points_cur := (maxi((end_rad - start_rad) / TAU * sector_points, 2)) * 2
 		var sector_points_step := 2.0 / (sector_points_cur - 2)
@@ -241,15 +282,16 @@ func _draw():
 			var pt_uv := Vector2(cos(pt_angle), sin(pt_angle))
 			var pt_uv_inner := Vector2(cos(pt_angle_inner), sin(pt_angle_inner)) * inner_radius_f
 			result_uv[j] = (pt_uv + Vector2.ONE) * 0.5
-			result_uv[sector_points_cur - 1 - j] = (pt_uv_inner + Vector2.ONE) * 0.5
 
 			if sector_theme == null:
 				result_positions[j] = pt_uv * global_radius + size * 0.5
 				result_positions[sector_points_cur - 1 - j] = pt_uv_inner * global_radius + size * 0.5
+				result_uv[sector_points_cur - 1 - j] = (pt_uv_inner + Vector2.ONE) * 0.5
 
 			else:
 				result_positions[j] = pt_uv * global_radius * sector_theme.radius_factor_outer + size * 0.5
 				result_positions[sector_points_cur - 1 - j] = pt_uv_inner * global_radius * sector_theme.radius_factor_inner + size * 0.5
+				result_uv[sector_points_cur - 1 - j] = (pt_uv_inner * sector_theme.radius_factor_inner / sector_theme.radius_factor_outer + Vector2.ONE) * 0.5
 
 		if sector_theme != null:
 			draw_colored_polygon(
