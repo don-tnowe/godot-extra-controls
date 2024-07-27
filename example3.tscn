@@ -1,8 +1,18 @@
-[gd_scene load_steps=4 format=3 uid="uid://dalf3ei7chg62"]
+[gd_scene load_steps=5 format=3 uid="uid://dalf3ei7chg62"]
 
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/interpolated_container/interpolated_flow_container.gd" id="1_2xacy"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/draggable.gd" id="1_huoov"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/interpolated_container/interpolated_box_container.gd" id="3_w4jrf"]
+
+[sub_resource type="GDScript" id="GDScript_1nia2"]
+script/source = "extends Button
+
+@export var to_sort : Array[InterpolatedContainer]
+
+func _pressed():
+	for x in to_sort:
+		x.sort_children_by_expression(func(a, b): return a.text < b.text)
+"
 
 [node name="Box" type="Node"]
 metadata/_edit_lock_ = true
@@ -369,3 +379,12 @@ offset_bottom = 36.0
 text = "Drag and drop between box containers!
 Containers have insert conditions."
 horizontal_alignment = 1
+
+[node name="Button" type="Button" parent="." node_paths=PackedStringArray("to_sort")]
+offset_left = 696.0
+offset_top = 155.0
+offset_right = 936.0
+offset_bottom = 190.0
+text = "Order these three (by text)"
+script = SubResource("GDScript_1nia2")
+to_sort = [NodePath("../PanelContainer5/InterpolatedBoxContainer"), NodePath("../PanelContainer6/InterpolatedBoxContainer"), NodePath("../PanelContainer4/InterpolatedBoxContainer")]

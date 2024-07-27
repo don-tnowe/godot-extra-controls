@@ -5,7 +5,6 @@ const elements_dir := "res://addons/tnowe_extra_controls/elements/"
 
 var element_scripts := [
 	["DataDropper", preload(elements_dir + "data_dropper.gd"), null],
-# Too lazy rn  # ["FileList", preload(elements_dir + "file_list.gd"), null],
 	["FlippedHSplitContainer", preload(elements_dir + "flipped_h_split_container.gd"), null],
 	["FlippedVSplitContainer", preload(elements_dir + "flipped_v_split_container.gd"), null],
 	["UnfoldedOptionButton", preload(elements_dir + "unfolded_option_button.gd"), null],
@@ -19,6 +18,8 @@ var element_scripts := [
 	["ChildSimpleTransformContainer", preload(elements_dir + "child_simple_transform_container.gd"), null],
 	["RemoteTransformRect", preload(elements_dir + "remote_transform_rect.gd"), null],
 	["RadialContainer", preload(elements_dir + "radial_container.gd"), null],
+	["InterpolatedFlowContainer", preload(elements_dir + "interpolated_container/interpolated_flow_container.gd"), null],
+	["InterpolatedBoxContainer", preload(elements_dir + "interpolated_container/interpolated_box_container.gd"), null],
 ]
 
 

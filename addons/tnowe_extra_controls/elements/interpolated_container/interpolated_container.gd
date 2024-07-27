@@ -6,6 +6,16 @@ extends Container
 
 ## Emitted when a node was dragged to be rearranged via [member allow_drag_reorder], every time the child order changes.
 signal order_changed()
+## Emitted if [member allow_drag_reorder] enabled, when a node was grabbed to be rearranged, once.
+signal drag_started(node : Control)
+## Emitted if [member allow_drag_reorder] enabled, when a node was placed down after dragging, once.
+signal drag_ended(node : Control)
+## Emitted if [member allow_drag_reorder] enabled, every time a node is moved by the mouse while being dragged.
+signal drag_moved(node : Control)
+## Emitted if [member allow_drag_transfer] enabled, once a node is transfered to another container by being dragged.
+signal drag_transfered_out(node : Control, into : InterpolatedContainer)
+## Emitted if [member allow_drag_insert] enabled, once a node is transfered out of another container by being dragged.
+signal drag_transfered_in(node : Control, from : InterpolatedContainer)
 
 ## Child alignment enum.
 enum ItemAlignment {
@@ -85,6 +95,15 @@ func fit_interpolated(child : Control, rect : Rect2):
 	_children_xforms_end[child_index] = Transform2D(Vector2(1, 0), Vector2(0, 1), child.position + child.size * 0.5)
 	_children_sizes_end[child_index] = child.size
 
+## Reorder children by a comparator function, similar to [method Array.sort_custom]. [br]
+## Not to be confused with [method _sort_children], which is a method you must override in a script to define child positions and sizes when the container updates.
+func sort_children_by_expression(expr : Callable):
+	var children := get_children()
+	children.sort_custom(expr)
+	for i in children.size():
+		if children[i].get_index() != i:
+			children[i].get_parent().move_child(children[i], i)
+
 
 func _process(delta : float):
 	if move_time == 0.0:
@@ -117,11 +136,13 @@ func _process(delta : float):
 func _input(event : InputEvent):
 	if event is InputEventMouseMotion && _dragging_node != null:
 		_dragging_node.global_position += event.relative
+		drag_moved.emit(_dragging_node)
 		_insert_child_at_position(_dragging_node)
 		if allow_drag_transfer && !Rect2(Vector2.ZERO, size).has_point(get_global_transform().affine_inverse() * event.global_position):
 			_insert_child_in_other(_dragging_node, event.global_position)
 
 	if event is InputEventMouseButton && event.button_index == MOUSE_BUTTON_LEFT && !event.pressed:
+		drag_ended.emit(_dragging_node)
 		_dragging_node = null
 		queue_sort()
 		set_process_input(false)
@@ -174,6 +195,8 @@ func _insert_child_in_other(child : Control, mouse_global_position : Vector2):
 			success_expr.parse(drag_insert_call_on_success)
 			success_expr.execute([self, x], child)
 
+		drag_transfered_out.emit(child, x)
+		x.drag_transfered_in.emit(child, self)
 		break
 
 
@@ -193,4 +216,5 @@ func _on_child_gui_input(event : InputEvent, child : Control):
 
 	if event is InputEventMouseButton && event.button_index == MOUSE_BUTTON_LEFT && event.pressed:
 		_dragging_node = child
+		drag_started.emit(child)
 		set_process_input(true)
