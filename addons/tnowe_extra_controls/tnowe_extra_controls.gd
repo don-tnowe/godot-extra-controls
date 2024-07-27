@@ -18,6 +18,7 @@ var element_scripts := [
 	["ChildTransformContainer", preload(elements_dir + "child_transform_container.gd"), null],
 	["ChildSimpleTransformContainer", preload(elements_dir + "child_simple_transform_container.gd"), null],
 	["RemoteTransformRect", preload(elements_dir + "remote_transform_rect.gd"), null],
+	["RadialContainer", preload(elements_dir + "radial_container.gd"), null],
 ]
 
 
