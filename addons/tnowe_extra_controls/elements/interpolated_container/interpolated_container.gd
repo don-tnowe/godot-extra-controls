@@ -8,7 +8,8 @@ extends Container
 signal order_changed()
 ## Emitted if [member allow_drag_reorder] enabled, when a node was grabbed to be rearranged, once.
 signal drag_started(node : Control)
-## Emitted if [member allow_drag_reorder] enabled, when a node was placed down after dragging, once.
+## Emitted if [member allow_drag_reorder] enabled, when a node was placed down after dragging, once. [br]
+## [b]Note:[/b] if transfered into another container, will be emitted by that container.
 signal drag_ended(node : Control)
 ## Emitted if [member allow_drag_reorder] enabled, every time a node is moved by the mouse while being dragged.
 signal drag_moved(node : Control)
@@ -42,8 +43,9 @@ enum ItemAlignment {
 @export var allow_drag_insert := false:
 	set(v):
 		allow_drag_insert = v
-		if v: _all_boxes.append(self)
-		else: _all_boxes.erase(self)
+		if is_inside_tree():
+			if v: _all_boxes.append(self)
+			else: _all_boxes.erase(self)
 ## Expression to test for [member allow_drag_insert] to know if a node can be inserted, executed on the node. If [code]true[/code], the node will be inserted.[br]
 ## The [code]from[/code] parameter will be a reference to the node it's dragged from, and [code]into[/code] will be this node. [br][br]
 ## For example, expression [code](get_class() == "Button" and into.has_method(&"insert_button_node"))[/code] tests if the dragged node is [code]Button[/code] and the destination has method[code]insert_button_node[/code]. [br][br]
@@ -134,6 +136,10 @@ func _process(delta : float):
 
 
 func _input(event : InputEvent):
+	if _dragging_node == null:
+		set_process_input(false)
+		return
+
 	if event is InputEventMouseMotion && _dragging_node != null:
 		_dragging_node.global_position += event.relative
 		drag_moved.emit(_dragging_node)
@@ -148,15 +154,19 @@ func _input(event : InputEvent):
 		set_process_input(false)
 
 
-func _enter_tree():
+func _ready():
+	set_process_input(false)
 	child_entered_tree.connect(_on_child_entered_tree)
 	child_exiting_tree.connect(_on_child_exiting_tree)
-	set_process_input(false)
+
+
+func _enter_tree():
+	if allow_drag_insert:
+		_all_boxes.append(self)
 
 
 func _exit_tree():
-	child_entered_tree.disconnect(_on_child_entered_tree)
-	child_exiting_tree.disconnect(_on_child_exiting_tree)
+	_all_boxes.erase(self)
 
 
 func _notification(what : int):

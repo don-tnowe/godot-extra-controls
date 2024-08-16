@@ -41,13 +41,15 @@ func _sort_children():
 		if vertical:
 			cur_row_length += cur_child_minsize.y + _separation
 			widest_child = maxf(cur_child_minsize.x, widest_child)
+			if cur_child.size_flags_vertical & SIZE_EXPAND != 0:
+				cur_row_expand_count += 1
 
 		else:
 			cur_row_length += cur_child_minsize.x + _separation
 			widest_child = maxf(cur_child_minsize.y, widest_child)
+			if cur_child.size_flags_horizontal & SIZE_EXPAND != 0:
+				cur_row_expand_count += 1
 
-		if cur_child.size_flags_horizontal & SIZE_EXPAND != 0:
-			cur_row_expand_count += 1
 
 	cur_row_length -= _separation
 	var result_size := Vector2(widest_child, cur_row_length) if vertical else Vector2(cur_row_length, widest_child)
