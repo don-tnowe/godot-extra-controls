@@ -20,6 +20,7 @@ var element_scripts := [
 	["RadialContainer", preload(elements_dir + "radial_container.gd"), null],
 	["InterpolatedFlowContainer", preload(elements_dir + "interpolated_container/interpolated_flow_container.gd"), null],
 	["InterpolatedBoxContainer", preload(elements_dir + "interpolated_container/interpolated_box_container.gd"), null],
+	["ConnectionLine", preload(elements_dir + "connection_line.gd"), null],
 ]
 
 

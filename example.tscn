@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://d2bii41ego0fp"]
+[gd_scene load_steps=16 format=3 uid="uid://d2bii41ego0fp"]
 
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/draggable.gd" id="1_eddsv"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/scroll_zoom_view.gd" id="1_pmqwv"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/scale_container.gd" id="4_c4kjh"]
 [ext_resource type="Texture2D" uid="uid://6lx2qwr7mkwg" path="res://icon.svg" id="4_yfgq0"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/max_size_container.gd" id="6_ri1pc"]
+[ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/connection_line.gd" id="9_axav4"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/radial_container_theme.gd" id="9_mu2b1"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/radial_container.gd" id="10_i8nra"]
 
@@ -321,6 +322,18 @@ metadata/_edit_group_ = true
 layout_mode = 2
 mouse_filter = 2
 color = Color(1, 0.792, 0.255, 0.5)
+
+[node name="Line" type="Control" parent="Control/ScrollZoomViewDemo/ScrollZoomView/Control" node_paths=PackedStringArray("connect_node1", "connect_node2")]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 167.0
+offset_top = 101.813
+offset_right = 414.0
+offset_bottom = 110.767
+script = ExtResource("9_axav4")
+connect_node1 = NodePath("../Draggable3")
+connect_node2 = NodePath("../Draggable2")
+end_style1 = 2
 
 [node name="RadialMenu" type="Control" parent="Control"]
 layout_mode = 1
