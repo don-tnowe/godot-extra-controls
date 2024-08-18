@@ -143,7 +143,9 @@ func _input(event : InputEvent):
 	if event is InputEventMouseMotion && _dragging_node != null:
 		_dragging_node.global_position += event.relative
 		drag_moved.emit(_dragging_node)
-		_insert_child_at_position(_dragging_node)
+		if allow_drag_reorder:
+			_insert_child_at_position(_dragging_node)
+
 		if allow_drag_transfer && !Rect2(Vector2.ZERO, size).has_point(get_global_transform().affine_inverse() * event.global_position):
 			_insert_child_in_other(_dragging_node, event.global_position)
 
@@ -221,7 +223,7 @@ func _on_child_exiting_tree(x : Node):
 
 
 func _on_child_gui_input(event : InputEvent, child : Control):
-	if !allow_drag_reorder:
+	if !allow_drag_reorder && !allow_drag_transfer:
 		return
 
 	if event is InputEventMouseButton && event.button_index == MOUSE_BUTTON_LEFT && event.pressed:
