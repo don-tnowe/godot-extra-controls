@@ -19,6 +19,24 @@ const _style_offsets := [0.0, 1.0, 0.5, 0.5]
 		queue_redraw()
 		set_process(redraw_every_frame)
 
+@export_group("Behaviour")
+## Allow dragging the beginning (point 1) of the line to connect it to another node, changing [member connect_node1]. Only works on [Control] targets.
+@export var allow_drag_pt1 := false
+## Allow dragging the end (point 2) of the line to connect it to another node, changing [member connect_node2]. Only works on [Control] targets.
+@export var allow_drag_pt2 := false
+## Whether to redraw the line every [code]_process()[/code]. Otherwise, update it with [method CanvasItem.queue_redraw].
+@export var redraw_every_frame := true:
+	set(v):
+		redraw_every_frame = v
+		set_process(v)
+## Expression to test for [member allow_drag_pt1] and [member allow_drag_pt2] to know if a node can be attached to, executed on that target node. If [code]true[/code], the node will be attached to.[br]
+## The [code]from[/code] parameter will be the previously attached node, [code]other[/code] will be the node attached to the opposite end, and [code]line[/code] will be this node. [br]
+## For example, expression [code](get_class() == "Button" and other.has_method(&"attach_button_node"))[/code] tests if the new target is a [code]Button[/code] and the other connected node has method [code]attach_button_node[/code]. [br][br]
+## [b]Warning: [/b] Some operators are unsupported in expressions, such as [code]is[/code] and ternary [code]if[/code]. Consider calling node's script methods after checking [code]has_method[/code].
+@export var drag_reattach_condition := ""
+## Expression to execute on the target after reattachment succeeds. Same parameters as [member drag_reattach_condition].
+@export var drag_reattach_call_on_success := ""
+
 @export_group("Style")
 ## The line's color.
 @export var line_color := Color.BLACK
@@ -32,13 +50,13 @@ const _style_offsets := [0.0, 1.0, 0.5, 0.5]
 @export_enum("None", "Arrow", "Circle", "Line") var end_style2 := 1
 ## The size of the arrow at the tip of the line. Affects [member end_style1] and [member end_style2] differently.
 @export var line_arrow_size := Vector2(6.0, 8.0)
-## Whether to redraw the line every [code]_process()[/code]. Otherwise, update it with [method CanvasItem.queue_redraw].
-@export var redraw_every_frame := true:
-	set(v):
-		redraw_every_frame = v
-		set_process(v)
+## When a drag via [member allow_drag_pt1] or [member allow_drag_pt2] is possible, this is the color of the hint circle.
+@export var drag_hint_color := Color(1.0, 1.0, 1.0, 0.75)
+## When a drag via [member allow_drag_pt1] or [member allow_drag_pt2] is possible, this is the radius of the hint circle.
+@export var drag_hint_radius := 8.0
 
 var _mouse_over := false
+var _mouse_dragging := 0
 var _label_clickable_rect := Rect2()
 var _clickable_line_start := Vector2()
 var _clickable_line_end := Vector2()
@@ -79,15 +97,25 @@ func _process(delta : float):
 
 
 func _has_point(point : Vector2) -> bool:
-	if !Rect2(Vector2.ZERO, size).grow(line_width).has_point(point):
+	if !Rect2(Vector2.ZERO, size).grow(drag_hint_radius).has_point(point):
 		return false
 
-	if (_clickable_line_end == _clickable_line_start):
-		return (point - position).length_squared() <= line_width * line_width
+	if allow_drag_pt1 && _is_in_radius(_clickable_line_start, point):
+		return true
 
-	var delta := _clickable_line_end - _clickable_line_start
-	var h := clampf(point.dot(delta) / delta.dot(delta), 0.0, 1.0);
-	return (point - h * delta).length_squared() <= line_width * line_width * 0.25;
+	if allow_drag_pt2 && _is_in_radius(_clickable_line_end, point):
+		return true
+
+	return false
+
+	# Line overlap checks: this is buggy and turns out to not actually be useful to detect
+
+	# if (_clickable_line_end == _clickable_line_start):
+	# 	return (point - position).length_squared() <= line_width * line_width
+
+	# var delta := _clickable_line_end - _clickable_line_start
+	# var h := clampf(point.dot(delta) / delta.dot(delta), 0.0, 1.0);
+	# return (point - h * delta).length_squared() <= line_width * line_width * 0.25;
 
 
 func _draw():
@@ -112,6 +140,11 @@ func _draw():
 
 	_clickable_line_start = line_start
 	_clickable_line_end = line_end
+
+	var mouse_point := get_local_mouse_position()
+	if _mouse_dragging == 1: line_start = mouse_point + position
+	if _mouse_dragging == 2: line_end = mouse_point + position
+
 	draw_set_transform(-position)
 	draw_line(
 		line_start + line_direction * line_arrow_size.y * _style_offsets[end_style1],
@@ -121,6 +154,13 @@ func _draw():
 	)
 	draw_arrow(line_end, line_start, end_style1)
 	draw_arrow(line_start, line_end, end_style2)
+
+	# Drag Area Hint
+	if allow_drag_pt1 && _is_in_radius(line_start, mouse_point):
+		draw_circle(line_start, drag_hint_radius, drag_hint_color)
+
+	if allow_drag_pt2 && _is_in_radius(line_end, mouse_point):
+		draw_circle(line_end, drag_hint_radius, drag_hint_color)
 
 
 func draw_arrow(line_start : Vector2, line_end : Vector2, style : int):
@@ -162,7 +202,7 @@ func draw_arrow(line_start : Vector2, line_end : Vector2, style : int):
 			)
 
 
-
+## Utility function to get a point on the intersection of the [code]rect[/code]'s border and the ray cast from its center in [code]direction[/code].
 static func get_rect_edge_position(rect : Rect2, direction : Vector2, margin : float = 0.0) -> Vector2:
 	var rect_size := rect.size + Vector2(margin, margin)
 	var use_vertical := absf(direction.y) > rect_size.y / rect_size.length()
@@ -175,8 +215,66 @@ static func get_rect_edge_position(rect : Rect2, direction : Vector2, margin : f
 	return rect.position + rect.size * 0.5 + direction
 
 
-func _gui_input(_event : InputEvent):
+func _is_in_radius(circle_center : Vector2, point : Vector2):
+	return (circle_center - position).distance_squared_to(point) <= drag_hint_radius * drag_hint_radius
+
+
+func _gui_input(event : InputEvent):
 	queue_redraw()
+	if event is InputEventMouseButton && event.button_index == MOUSE_BUTTON_LEFT:
+		var mouse_point : Vector2 = event.position
+		if !event.pressed && _mouse_dragging != 0:
+			mouse_point += position
+			var succeeded_on : Control
+			var other_connection := connect_node2 if _mouse_dragging == 1 else connect_node1
+			var drag_reattach_condition_expr := Expression.new()
+			var expr_params : Array = [
+				connect_node1 if _mouse_dragging == 1 else connect_node2,
+				connect_node2 if _mouse_dragging == 1 else connect_node1,
+				self
+			]
+			if drag_reattach_condition_expr.parse(drag_reattach_condition, [&"from", &"other", &"line"]) != OK:
+				# Couldn't parse expression, so don't call it.
+				drag_reattach_condition_expr = null
+
+			if _mouse_dragging == 1:
+				for x in connect_node1.get_parent().get_children():
+					if x == connect_node2 || !(x is Control) || !x.get_rect().has_point(mouse_point):
+						continue
+
+					if drag_reattach_condition_expr != null && !drag_reattach_condition_expr.execute(expr_params, x):
+						continue
+
+					connect_node1 = x
+					succeeded_on = x
+					break
+
+			else:
+				for x in connect_node2.get_parent().get_children():
+					if x == connect_node1 || !(x is Control) || !x.get_rect().has_point(mouse_point):
+						continue
+
+					if drag_reattach_condition_expr != null && !drag_reattach_condition_expr.execute(expr_params, x):
+						continue
+
+					connect_node2 = x
+					succeeded_on = x
+					break
+
+			if succeeded_on != null:
+				var drag_reattach_call_on_success_expr := Expression.new()
+				drag_reattach_call_on_success_expr.parse(drag_reattach_call_on_success, [&"from", &"other", &"line"])
+				drag_reattach_call_on_success_expr.execute(expr_params, succeeded_on)
+
+			_mouse_dragging = 0
+			return
+
+		_mouse_dragging = 0
+		if allow_drag_pt1 && _is_in_radius(_clickable_line_start, mouse_point):
+			_mouse_dragging = 1
+
+		elif allow_drag_pt2 && _is_in_radius(_clickable_line_end, mouse_point):
+			_mouse_dragging = 2
 
 
 func _on_mouse_entered():
