@@ -16,6 +16,7 @@ A collection of control nodes usable in a variety of games and GUI applications.
 
 ## Utility:
 
+- **Container Quantity Keeper**: Keeps count of duplicates added as a child to a node, and merges them into one node. Best with **Interpolated Box/Flow**.
 - **Remote Transform Rect**: transform a Control remotely similar to RemoteTransform2D/3D
 - **Data Dropper**: passes drag-and-drop via signal
 - **Flipped Split**: SplitContainer anchored to the other side for when the parent is resized

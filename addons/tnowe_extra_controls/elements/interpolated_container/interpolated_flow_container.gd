@@ -123,6 +123,9 @@ func _insert_child_at_position(child : Control):
 
 	for i in _row_start_child_index[result_row + 1] - _row_start_child_index[result_row]:
 		i += _row_start_child_index[result_row]
+		if children.size() <= i:
+			break
+
 		if !(children[i] is Control && children[i].visible):
 			continue
 
@@ -130,7 +133,7 @@ func _insert_child_at_position(child : Control):
 		var result_index := (i if i <= child_former_index else i - 1) - row_change_offset
 		if _children_xforms_end[i].origin.x - child.size.x * 0.5 > child.position.x:
 			if result_index != child_former_index:
-				move_child(child, result_index)
+				move_child(child, minf(result_index, children.size()))
 				order_changed.emit()
 
 			return
@@ -140,5 +143,5 @@ func _insert_child_at_position(child : Control):
 		result_index -= 1
 
 	if child_former_index != result_index:
-		move_child(child, result_index)
+		move_child(child, minf(result_index, children.size()))
 		order_changed.emit()

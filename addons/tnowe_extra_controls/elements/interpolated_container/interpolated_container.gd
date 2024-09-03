@@ -160,6 +160,8 @@ func _ready():
 	set_process_input(false)
 	child_entered_tree.connect(_on_child_entered_tree)
 	child_exiting_tree.connect(_on_child_exiting_tree)
+	for x in get_children():
+		_on_child_entered_tree(x)
 
 
 func _enter_tree():
