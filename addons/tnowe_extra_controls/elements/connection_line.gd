@@ -119,23 +119,33 @@ func _has_point(point : Vector2) -> bool:
 
 
 func _draw():
-	var line_start : Vector2 = connect_node1.position
-	var line_end : Vector2 = connect_node2.position
+	var line_start : Vector2 = connect_node1.global_position
+	var line_end : Vector2 = connect_node2.global_position
+	var xform_start := connect_node1.get_global_transform()
+	var xform_end := connect_node2.get_global_transform()
 	if connect_node1 is Control:
-		line_start += connect_node1.size * 0.5
+		line_start += xform_start.basis_xform_inv(connect_node1.size * 0.5)
 
 	if connect_node2 is Control:
-		line_end += connect_node2.size * 0.5
+		line_end += xform_end.basis_xform_inv(connect_node2.size * 0.5)
 
 	var line_direction := (line_end - line_start).normalized()
 	if connect_node1 is Control:
-		line_start = get_rect_edge_position(connect_node1.get_rect(), +line_direction, connection_margin)
+		line_start = xform_start * get_global_transform().basis_xform(get_rect_edge_position(
+			Rect2(Vector2.ZERO, connect_node1.size),
+			xform_start.basis_xform_inv(+line_direction).normalized(),
+			connection_margin,
+		))
 
 	if connect_node2 is Control:
-		line_end = get_rect_edge_position(connect_node2.get_rect(), -line_direction, connection_margin)
+		line_end = xform_end *  get_global_transform().basis_xform(get_rect_edge_position(
+			Rect2(Vector2.ZERO, connect_node2.size),
+			xform_end.basis_xform_inv(-line_direction).normalized(),
+			connection_margin,
+		))
 
 	var result_rect := Rect2(line_start, Vector2.ZERO).expand(line_end)
-	position = result_rect.position
+	global_position = result_rect.position
 	size = result_rect.size
 
 	_clickable_line_start = line_start
