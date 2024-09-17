@@ -44,6 +44,8 @@ const _style_offsets := [0.0, 1.0, 0.5, 0.5]
 @export var line_width := 4.0
 ## The spacing between this connection's edge and the node's rect.
 @export var connection_margin := 4.0
+## Minimum line length. If a redraw of the line would make it shorter than this, it extends back to this length.
+@export var line_min_length := 0.0
 ## The style of the end touching [member connect_node1].
 @export_enum("None", "Arrow", "Circle", "Line") var end_style1 := 0
 ## The style of the end touching [member connect_node2].
@@ -119,10 +121,15 @@ func _has_point(point : Vector2) -> bool:
 
 
 func _draw():
-	var line_start : Vector2 = connect_node1.global_position
-	var line_end : Vector2 = connect_node2.global_position
 	var xform_start := connect_node1.get_global_transform()
 	var xform_end := connect_node2.get_global_transform()
+	if get_parent() is CanvasItem:
+		var parent_xform : Transform2D = get_parent().get_global_transform().affine_inverse()
+		xform_start = parent_xform * xform_start
+		xform_end = parent_xform * xform_end
+
+	var line_start := xform_start.origin
+	var line_end := xform_end.origin
 	if connect_node1 is Control:
 		line_start += xform_start.basis_xform_inv(connect_node1.size * 0.5)
 
@@ -131,21 +138,26 @@ func _draw():
 
 	var line_direction := (line_end - line_start).normalized()
 	if connect_node1 is Control:
-		line_start = xform_start * get_global_transform().basis_xform(get_rect_edge_position(
+		line_start = xform_start * get_rect_edge_position(
 			Rect2(Vector2.ZERO, connect_node1.size),
 			xform_start.basis_xform_inv(+line_direction).normalized(),
 			connection_margin,
-		))
+		)
 
 	if connect_node2 is Control:
-		line_end = xform_end *  get_global_transform().basis_xform(get_rect_edge_position(
+		line_end = xform_end * get_rect_edge_position(
 			Rect2(Vector2.ZERO, connect_node2.size),
 			xform_end.basis_xform_inv(-line_direction).normalized(),
 			connection_margin,
-		))
+		)
+
+	if line_start.distance_squared_to(line_end) < line_min_length * line_min_length || (line_end - line_start).normalized().dot(line_direction) < 0.0:
+		var line_start_plus_end := line_start + line_end
+		line_start = (line_start_plus_end - line_direction * line_min_length) * 0.5
+		line_end = (line_start_plus_end + line_direction * line_min_length) * 0.5
 
 	var result_rect := Rect2(line_start, Vector2.ZERO).expand(line_end)
-	global_position = result_rect.position
+	position = result_rect.position
 	size = result_rect.size
 
 	_clickable_line_start = line_start
@@ -236,7 +248,6 @@ func _gui_input(event : InputEvent):
 		if !event.pressed && _mouse_dragging != 0:
 			mouse_point += position
 			var succeeded_on : Control
-			var other_connection := connect_node2 if _mouse_dragging == 1 else connect_node1
 			var drag_reattach_condition_expr := Expression.new()
 			var expr_params : Array = [
 				connect_node1 if _mouse_dragging == 1 else connect_node2,
