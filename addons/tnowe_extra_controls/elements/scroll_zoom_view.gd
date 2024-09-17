@@ -23,6 +23,8 @@ extends MarginContainer
 ## The speed at which the visible zoom amount moves toward the target amount, 0-1 factor. [br]
 ## Set to 0 to prevent zoom. Set to 1 to make it instant.
 @export_range(0.0, 1.0) var zoom_interp_speed := 0.25
+## If [code]true[/code], zooming tries to ensure that the mouse cursor's position stays in place while zooming. Otherwise, use this node's center as pivot.
+@export var zoom_use_mouse_as_pivot := true
 
 @export_group("State")
 ## The current zoom amount. If set at runtime, will interpolate smoothly using [member zoom_interp_speed].
@@ -30,7 +32,7 @@ extends MarginContainer
 	set(v):
 		zoom_amount = v
 		set_process(true)
-## The current panning position.
+## The current panning position, relative to this node's origin.
 @export var scroll_offset := Vector2():
 	set(v):
 		scroll_offset = v
@@ -50,11 +52,16 @@ var _zoom_visible := 1.0:
 
 
 func _process(_delta : float):
+	if !zoom_use_mouse_as_pivot:
+		_zoom_pivot = get_global_transform().basis_xform_inv(size * 0.5)
+
 	var old_zoom := _zoom_visible
-	scroll_offset -= _zoom_pivot
 	_zoom_visible = lerp(_zoom_visible, zoom_amount, zoom_interp_speed)
-	scroll_offset *= (_zoom_visible / old_zoom)
-	scroll_offset += _zoom_pivot
+
+	var scroll_offset_result := scroll_offset - _zoom_pivot
+	scroll_offset_result *= _zoom_visible / old_zoom
+	scroll_offset = scroll_offset_result + _zoom_pivot
+
 	if is_equal_approx(zoom_amount, _zoom_visible):
 		_zoom_visible = zoom_amount
 		set_process(false)
@@ -63,7 +70,7 @@ func _process(_delta : float):
 func _gui_input(event : InputEvent):
 	if event is InputEventMouseMotion:
 		if !_input_dragging:
-			_zoom_pivot = event.position
+			_zoom_pivot = get_global_transform().affine_inverse() * event.global_position
 			return
 
 		if !_input_drag_can_move:
