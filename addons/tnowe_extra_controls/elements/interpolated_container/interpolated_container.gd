@@ -196,7 +196,7 @@ func _insert_child_in_other(child : Control, mouse_global_position : Vector2):
 		if !x.allow_drag_insert || !Rect2(Vector2.ZERO, x.size).has_point(x.get_global_transform().affine_inverse() * mouse_global_position):
 			continue
 
-		if x._drag_insert_condition_exp.execute([self, x], child) != true:
+		if x._drag_insert_condition_exp != null && x._drag_insert_condition_exp.execute([self, x], child) != true:
 			continue
 
 		child.reparent(x)
