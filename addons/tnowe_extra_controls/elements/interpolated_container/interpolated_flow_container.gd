@@ -5,7 +5,10 @@ extends InterpolatedContainer
 ## A container that displays children in a row, wrapping overflow around, with an additional smooth repositioning feature.
 ##
 ## Handles children with the Expand size flag. [br]
-## Control spacing by setting the theme's FlowContainer constants.
+## Control spacing by setting the theme's FlowContainer constants. [br]
+## Provides optional drag-and-drop feature to reorder items via pointer. [br]
+## [b]Note:[/b] users can only reorder/transfer children that have [member Control.mouse_filter] set to Stop. [br]
+## [b]Note:[/b] this works with any [Control] type and does not require children to be [Draggable].
 
 var _row_start_child_index : Array[int] = [0]
 var _row_tops : Array[float] = [0]

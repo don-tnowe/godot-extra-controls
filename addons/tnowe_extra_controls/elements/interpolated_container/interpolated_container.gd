@@ -3,6 +3,10 @@ class_name InterpolatedContainer
 extends Container
 
 ## Base class for containers that, when children inserted, animate their movement toward their target position.
+##
+## Provides optional drag-and-drop feature to reorder items via pointer. [br]
+## [b]Note:[/b] users can only reorder/transfer children that have [member Control.mouse_filter] set to Stop. [br]
+## [b]Note:[/b] this works with any [Control] type and does not require children to be [Draggable].
 
 ## Emitted when a node was dragged to be rearranged via [member allow_drag_reorder], every time the child order changes.
 signal order_changed()

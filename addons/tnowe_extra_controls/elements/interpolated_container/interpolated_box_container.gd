@@ -4,9 +4,12 @@ extends InterpolatedContainer
 
 ## A container that displays children in a row or column, compacting them to fit width if too many, with a smooth repositioning feature.
 ##
+## Handles children with the Expand size flag. [br]
+## Control spacing by setting the theme's BoxContainer constants. [br]
 ## Provides optional drag-and-drop feature to reorder items via pointer. [br]
-## Handles children with the Expand size flag. Sort of. [br]
-## Control spacing by setting the theme's BoxContainer constants.
+## [b]Note:[/b] users can only reorder/transfer children that have [member Control.mouse_filter] set to Stop. [br]
+## [b]Note:[/b] this works with any [Control] type and does not require children to be [Draggable].
+
 
 ## Enable if the box should behave like a [VBoxContainer]. Otherwise, works like an [HBoxContainer].
 @export var vertical := false:

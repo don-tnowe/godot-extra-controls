@@ -3,6 +3,9 @@ class_name Draggable
 extends Container
 
 ## Draggable control. Can be resized by dragging the border, and constrained to only be movable within its parent Control.
+##
+## [b]Note:[/b] this container will only be grabbed if the mouse pointer does not overlap children with [member Control.mouse_filter] set to Stop. [br]
+## [b]Note:[/b] this can be the child of any [Control], but it is not compatible with [InterpolatedContainer].
 
 ## Emitted when the mouse button is released after the node is moved or resized.
 signal drag_ended()
@@ -44,6 +47,17 @@ var _size_buffered := Vector2.ZERO
 func _init():
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
+
+
+func _enter_tree():
+	update_configuration_warnings()
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	if get_parent() is InterpolatedContainer:
+		return ["This Draggable is inside of an InterpolatedContainer! The two classes implement separate features, and are incompatible:\n- InterpolatedContainer can have children of any other Control type. Keep it if you need a container for nodes with a way to reorder them and transfer to other containers. \n- Draggable can have a parent of any other type. Keep it if you need free drag-and-drop on a 2D plane."]
+
+	return []
 
 
 func _draw():

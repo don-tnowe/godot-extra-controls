@@ -2,7 +2,7 @@
 class_name ConnectionLine
 extends Control
 
-## A line that connects between two [Control]s or [Node2D]s. Must be in the same coordinate system with the targets, for example having the same parent.
+## A line that connects between two [Control]s or [Node2D]s. Targets do not need have the same parent, only be in the same [Viewport].
 
 const _style_offsets := [0.0, 1.0, 0.5, 0.5]
 
@@ -77,8 +77,8 @@ func _process(delta : float):
 		return
 
 	# Redraw, but only if positions changed.
-	if connect_node1 is Control && _last_rect1 != connect_node1.get_rect():
-		_last_rect1 = connect_node1.get_rect()
+	if connect_node1 is Control && _last_rect1 != connect_node1.get_global_rect():
+		_last_rect1 = connect_node1.get_global_rect()
 		queue_redraw()
 		return
 
@@ -87,8 +87,8 @@ func _process(delta : float):
 		queue_redraw()
 		return
 
-	if connect_node2 is Control && _last_rect2 != connect_node2.get_rect():
-		_last_rect2 = connect_node2.get_rect()
+	if connect_node2 is Control && _last_rect2 != connect_node2.get_global_rect():
+		_last_rect2 = connect_node2.get_global_rect()
 		queue_redraw()
 		return
 
