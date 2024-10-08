@@ -18,8 +18,11 @@ var element_scripts := [
 	["ChildSimpleTransformContainer", preload(elements_dir + "child_simple_transform_container.gd"), null],
 	["RemoteTransformRect", preload(elements_dir + "remote_transform_rect.gd"), null],
 	["RadialContainer", preload(elements_dir + "radial_container.gd"), null],
+	["RadialContainerTheme", preload(elements_dir + "radial_container_theme.gd"), null],
 	["InterpolatedFlowContainer", preload(elements_dir + "interpolated_container/interpolated_flow_container.gd"), null],
 	["InterpolatedBoxContainer", preload(elements_dir + "interpolated_container/interpolated_box_container.gd"), null],
+	["ContainerQuantityKeeper", preload(elements_dir + "interpolated_container/container_quantity_keeper.gd"), null],
+	["Draggable", preload(elements_dir + "draggable.gd"), null],
 	["ConnectionLine", preload(elements_dir + "connection_line.gd"), null],
 ]
 
