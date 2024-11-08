@@ -50,6 +50,13 @@ enum ItemAlignment {
 		if is_inside_tree():
 			if v: _all_boxes.append(self)
 			else: _all_boxes.erase(self)
+## If the child count matches this, new children cannot be added through [member allow_drag_insert]. Does not prevent other means of adding children.[br]
+## Set to [code]-1[/code] to remove the limit. [br]
+## This is equivalent to [member drag_insert_condition] set to [code]into.get_child_count() < (count)[/code].
+@export var drag_max_count := -1:
+	set(v):
+		if v < -1: v = -1
+		drag_max_count = v
 ## Expression to test for [member allow_drag_insert] to know if a node can be inserted, executed on the node. If [code]true[/code], the node will be inserted.[br]
 ## The [code]from[/code] parameter will be a reference to the node it's dragged from, and [code]into[/code] will be this node. [br][br]
 ## For example, expression [code](get_class() == "Button" and into.has_method(&"insert_button_node"))[/code] tests if the dragged node is [code]Button[/code] and the destination has method[code]insert_button_node[/code]. [br][br]
@@ -198,6 +205,9 @@ func _notification(what : int):
 func _insert_child_in_other(child : Control, mouse_global_position : Vector2):
 	for x in _all_boxes:
 		if !x.allow_drag_insert || !Rect2(Vector2.ZERO, x.size).has_point(x.get_global_transform().affine_inverse() * mouse_global_position):
+			continue
+
+		if x.drag_max_count > -1 && x.get_child_count() >= x.drag_max_count:
 			continue
 
 		if x._drag_insert_condition_exp != null && x._drag_insert_condition_exp.execute([self, x], child) != true:
