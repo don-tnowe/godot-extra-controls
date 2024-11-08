@@ -4,7 +4,7 @@ extends Control
 
 ## A line that connects between two [Control]s or [Node2D]s. Targets do not need have the same parent, only be in the same [Viewport].
 
-const _style_offsets := [0.0, 1.0, 0.5, 0.5]
+const _style_offsets : Array[Vector2] = [0.0, 1.0, 0.5, 0.5]
 
 ## Node that will connect to the beginning of the line.
 @export var connect_node1 : CanvasItem:
@@ -42,6 +42,10 @@ const _style_offsets := [0.0, 1.0, 0.5, 0.5]
 @export var line_color := Color.BLACK
 ## Line width, affecting the clickable area.
 @export var line_width := 4.0
+## Texture stretching along the line.
+@export var line_texture : Texture2D
+## If [code]true[/code], [member texture] will repeat along the line. [member CanvasItem.texture_repeat] of the [ConnectionLine] node must be CanvasItem.TEXTURE_REPEAT_ENABLED or CanvasItem.TEXTURE_REPEAT_MIRROR for it to work properly.
+@export var line_texture_tile := false
 ## The spacing between this connection's edge and the node's rect.
 @export var connection_margin := 4.0
 ## Minimum line length. If a redraw of the line would make it shorter than this, it extends back to this length.
@@ -168,12 +172,36 @@ func _draw():
 	if _mouse_dragging == 2: line_end = mouse_point + position
 
 	draw_set_transform(-position)
-	draw_line(
-		line_start + line_direction * line_arrow_size.y * _style_offsets[end_style1],
-		line_end - line_direction * line_arrow_size.y * _style_offsets[end_style2],
-		line_color,
-		line_width,
-	)
+	if line_texture == null:
+		draw_line(
+			line_start + line_direction * line_arrow_size.y * _style_offsets[end_style1],
+			line_end - line_direction * line_arrow_size.y * _style_offsets[end_style2],
+			line_color,
+			line_width,
+		)
+
+	else:
+		var line_start_poly := line_start + line_direction * line_arrow_size.y * _style_offsets[end_style1]
+		var line_end_poly := line_end - line_direction * line_arrow_size.y * _style_offsets[end_style2]
+		var length_in_textures := 1.0
+		if line_texture_tile:
+			length_in_textures = (line_end_poly - line_start_poly).length() * (float(line_texture.get_height()) / line_texture.get_width()) / line_width
+
+		var line_direction_rotated := Vector2(-line_direction.y, line_direction.x) * line_width * 0.5
+		draw_colored_polygon(
+			[
+				line_end_poly - line_direction_rotated,
+				line_end_poly + line_direction_rotated,
+				line_start_poly + line_direction_rotated,
+				line_start_poly - line_direction_rotated,
+			], line_color, [
+				Vector2(length_in_textures, 0.0),
+				Vector2(length_in_textures, 1.0),
+				Vector2(0.0, 1.0),
+				Vector2(0.0, 0.0),
+			], line_texture
+		)
+
 	draw_arrow(line_end, line_start, end_style1)
 	draw_arrow(line_start, line_end, end_style2)
 
