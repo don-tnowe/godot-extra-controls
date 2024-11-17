@@ -4,7 +4,7 @@ extends Control
 
 ## A line that connects between two [Control]s or [Node2D]s. Targets do not need have the same parent, only be in the same [Viewport].
 
-const _style_offsets : Array[Vector2] = [0.0, 1.0, 0.5, 0.5]
+const _style_offsets : Array[float] = [0.0, 1.0, 0.5, 0.5]
 
 ## Node that will connect to the beginning of the line.
 @export var connect_node1 : CanvasItem:
