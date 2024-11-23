@@ -83,6 +83,7 @@ var _children_sizes_start : Array[Vector2] = []
 var _children_sizes_end : Array[Vector2] = []
 var _interp_progress_factor := 0.0
 var _skip_next_reorder := false
+var _affected_by_multi_selection : MultiSelection
 
 ## Override to define the behaviour for dragging a node via drag-and-drop rearrangement. [br]
 ## Should emit [signal order_changed] if the node's index was successfully changed.
@@ -145,6 +146,9 @@ func _process(delta : float):
 	if _interp_progress_factor >= 1.0:
 		set_process(false)
 
+	if _affected_by_multi_selection != null:
+		_affected_by_multi_selection.queue_redraw()
+
 
 func _input(event : InputEvent):
 	if _dragging_node == null:
@@ -159,6 +163,21 @@ func _input(event : InputEvent):
 
 		if allow_drag_transfer && !Rect2(Vector2.ZERO, size).has_point(get_global_transform().affine_inverse() * event.global_position):
 			_insert_child_in_other(_dragging_node, event.global_position)
+
+		if _affected_by_multi_selection == null:
+			return
+
+		for x in _affected_by_multi_selection._selected_nodes:
+			if !is_instance_valid(x) || !(x is CanvasItem) || x == _dragging_node:
+				# CanvasItem doesn't actually have a global position, but both subclasses do.
+				continue
+
+			x.global_position += event.relative
+			drag_moved.emit(x)
+			if allow_drag_transfer && !Rect2(Vector2.ZERO, size).has_point(get_global_transform().affine_inverse() * event.global_position):
+				_insert_child_in_other(x, event.global_position)
+
+			_affected_by_multi_selection.queue_redraw()
 
 	if event is InputEventMouseButton && event.button_index == MOUSE_BUTTON_LEFT && !event.pressed:
 		drag_ended.emit(_dragging_node)

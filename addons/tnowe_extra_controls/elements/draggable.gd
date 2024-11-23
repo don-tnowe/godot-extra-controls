@@ -42,6 +42,7 @@ var _mouse_dragging := false
 var _mouse_dragging_direction := Vector2i.ZERO
 var _drag_initial_pos := Vector2.ZERO
 var _size_buffered := Vector2.ZERO
+var _affected_by_multi_selection : MultiSelection
 
 
 func _init():
