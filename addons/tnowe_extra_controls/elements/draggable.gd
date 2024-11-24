@@ -225,10 +225,10 @@ func _universal_input(input_resize_direction : Vector2, drag_amount : Vector2):
 		_size_buffered.y += drag_amount.y * input_resize_direction.y
 
 	var pos_change := Vector2.ZERO
-	if (is_diagonal || input_resize_direction.x == 0) && input_resize_direction.y <= 0 && _size_buffered.y >= get_combined_minimum_size().y:
+	if (is_diagonal || input_resize_direction.x == 0) && input_resize_direction.y <= 0 && _size_buffered.y >= _get_resize_minimum_size().y:
 		pos_change.y = drag_amount.y
 
-	if (is_diagonal || input_resize_direction.y == 0) && input_resize_direction.x <= 0 && _size_buffered.x >= get_combined_minimum_size().x:
+	if (is_diagonal || input_resize_direction.y == 0) && input_resize_direction.x <= 0 && _size_buffered.x >= _get_resize_minimum_size().x:
 		pos_change.x = drag_amount.x
 
 	position += get_transform().basis_xform(pos_change)
@@ -238,7 +238,6 @@ func _universal_input(input_resize_direction : Vector2, drag_amount : Vector2):
 
 func _handle_click(button_pressed : bool):
 	_mouse_dragging = button_pressed
-	_size_buffered = size
 	if !_mouse_dragging:
 		var result_rect := get_rect_after_drop()
 		if _affected_by_free_container == null:
@@ -247,6 +246,7 @@ func _handle_click(button_pressed : bool):
 
 		drag_ended.emit()
 
+	_size_buffered = size
 	_drag_initial_pos = position
 	queue_redraw()
 
@@ -261,7 +261,7 @@ func _on_mouse_exited():
 	queue_redraw()
 
 
-func _get_minimum_size() -> Vector2:
+func _get_resize_minimum_size() -> Vector2:
 	var result_size := Vector2(0.0, 0.0)
 	for x in get_children(true):
 		if x is Control:
@@ -271,7 +271,14 @@ func _get_minimum_size() -> Vector2:
 	if resize_margin_offset_children:
 		result_size += resize_margin + resize_margin
 
-	return result_size
+	return Vector2(
+		maxf(result_size.x, custom_minimum_size.x),
+		maxf(result_size.y, custom_minimum_size.y),
+	)
+
+
+func _get_minimum_size() -> Vector2:
+	return _get_resize_minimum_size()
 
 
 func _notification(what : int):
