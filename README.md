@@ -5,7 +5,8 @@ A collection of control nodes usable in a variety of games and GUI applications.
 
 ## Containers:
 
-- **Interpolated Box/Flow**: Containers that smoothly animate children when they enter or change order. Drag-and-drop reordering and drag-and-drop to move between containers in both variants. Vertical layout and compacting children to fit are features supported in the Box variant.
+- **Interpolated Box/Flow/Free**: Containers that smoothly animate children when they enter or change order. Drag-and-drop reordering and drag-and-drop to move between containers in all variants.
+	- **InterpolatedBoxContainer** also supports vertical layout and compacting children to fit.
 - **Radial Container**: script-based "Pie menu", supports texturing, tweening, different item sizes (*via size_flags_stretch_ratio*), and multiple position-to-index functions.
 - **ScaleContainer**: When resized, scales children instead of resizing them. With the integer scale setting, can be used for pixel-perfect viewports.
 - **Child Transform Container**: transform a Control's children while preserving minimum size.
@@ -29,14 +30,20 @@ A collection of control nodes usable in a variety of games and GUI applications.
 - **Properties Box**: Form to input values like you'd use the inspector. Strings, bools, numbers (*sliders supported*) and enums. Allows foldable groups.
 - **Unfolded Option Button**: list of options, pick one or use as bit flags
 
-#
+## Attribution and Contact
 
 Made by Don Tnowe in 2023.
 
+[License](./LICENSE.md)
+
 [My Website](https://redbladegames.netlify.app)
 
-[Itch](https://don-tnowe.itch.io)
+[My games on Itch](https://don-tnowe.itch.io)
 
-[Twitter](https://twitter.com/don_tnowe)
+**Need help or want to chat? Message me!** [Telegram](https://t.me/don_tnowe), [Discord](https://discord.com/channels/@me/726139164566880426)
+
+**Did this tool help you so much you'd like to give back?** [Donate on PayPal!](https://www.paypal.com/donate?hosted_button_id=VURRD7VAZ8C9E)
+
+#
 
 Copying and Modification is allowed in accordance to the MIT license, full text is included.
