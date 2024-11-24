@@ -4,6 +4,7 @@ extends Control
 ## Adds multiple-selection and box-selection functionality to children of specified nodes. Can detect [CollisionObject2D] and [Control] nodes. Can move [Draggable] and [InterpolatedContainer] nodes.
 ##
 ## [b]Note:[/b] selected [Control] nodes will have a box visible around them, but [CollisionObject2D] will not. Consider handling this with this node's signals.
+## [b]Note:[/b] usage with [InterpolatedContainer] has visual issues related to controls not being ignored by the animation system while dragged. A fix for this is planned.
 
 ## Emitted when a node gets added to the selection.
 signal node_added(node : Node)
@@ -21,7 +22,7 @@ signal node_removed(node : Node)
 @export var style_selected : StyleBox
 ## The amount the [member style_selected] box gets expanded, in pixels.
 @export var style_selected_margin : float = 4.0
-## The keyboard key to hold down to add nodes to the selection.
+## The keyboard key to hold down to add nodes to the selection instead of clearing the selection. Affects [method single_select] and 
 @export var modifier_key : Key = KEY_SHIFT
 
 var _targets_active : Array[Node] = []
@@ -55,7 +56,7 @@ func box_drag(global_pos : Vector2):
 	_box_corner_end = global_pos
 	queue_redraw()
 
-## Ends the selection box, selecting all nodes in the box. If [member modifier_key] is held down, adds to selection instead of replacing.
+## Ends the selection box, selecting all nodes in the box. If [member modifier_key] is held down, adds to current selection instead of clearing the previous selection.
 func box_end(global_pos : Vector2):
 	var selection_rect := Rect2(_box_corner_start, global_pos - _box_corner_start).abs()
 	var selection_shape := RectangleShape2D.new()

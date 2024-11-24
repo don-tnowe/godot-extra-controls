@@ -24,6 +24,7 @@ var element_scripts := [
 	["ContainerQuantityKeeper", preload(elements_dir + "interpolated_container/container_quantity_keeper.gd"), null],
 	["Draggable", preload(elements_dir + "draggable.gd"), null],
 	["ConnectionLine", preload(elements_dir + "connection_line.gd"), null],
+	["MultiSelection", preload(elements_dir + "multi_selection.gd"), null],
 ]
 
 
