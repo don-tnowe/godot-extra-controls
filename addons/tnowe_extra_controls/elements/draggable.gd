@@ -135,26 +135,23 @@ func get_rect_after_drop() -> Rect2:
 	return Rect2(result_position, result_size)
 
 
-func _gui_input(event : InputEvent):
+func _gui_input(event : InputEvent, called_by : Draggable = null):
 	if event is InputEventMouseMotion:
 		if _mouse_dragging:
-			var is_diagonal := absi(_mouse_dragging_direction.x) + absi(_mouse_dragging_direction.y) == 2
-			if _mouse_dragging_direction.x != 0:
-				_size_buffered.x += event.relative.x * _mouse_dragging_direction.x
+			_universal_input(_mouse_dragging_direction, event.relative)
+			if _affected_by_multi_selection != null:
+				var own_xform_inv := get_global_transform().affine_inverse()
+				for x in _affected_by_multi_selection._selected_nodes:
+					if !(x is Draggable) || x == self:
+						continue
 
-			if _mouse_dragging_direction.y != 0:
-				_size_buffered.y += event.relative.y * _mouse_dragging_direction.y
+					if _mouse_dragging_direction == Vector2i.ZERO:
+						x._universal_input(_mouse_dragging_direction, (x.get_global_transform() * own_xform_inv).affine_inverse().basis_xform(event.relative))
 
-			var pos_change := Vector2.ZERO
-			if (is_diagonal || _mouse_dragging_direction.x == 0) && _mouse_dragging_direction.y <= 0 && _size_buffered.y >= get_combined_minimum_size().y:
-				pos_change.y = event.relative.y
+					else:
+						x._universal_input(_mouse_dragging_direction, event.relative)
 
-			if (is_diagonal || _mouse_dragging_direction.y == 0) && _mouse_dragging_direction.x <= 0 && _size_buffered.x >= get_combined_minimum_size().x:
-				pos_change.x = event.relative.x
-
-			position += get_transform().basis_xform(pos_change)
-			size = _size_buffered
-			queue_redraw()
+				_affected_by_multi_selection.queue_redraw()
 
 		elif resize_margin == Vector2.ZERO:
 			_mouse_dragging_direction = Vector2i.ZERO
@@ -190,16 +187,48 @@ func _gui_input(event : InputEvent):
 			queue_redraw()
 
 	if event is InputEventMouseButton && event.button_index == MOUSE_BUTTON_LEFT:
-		_mouse_dragging = event.pressed
-		_size_buffered = size
-		if !_mouse_dragging:
-			var result_rect := get_rect_after_drop()
-			position = result_rect.position
-			size = result_rect.size
-			drag_ended.emit()
+		if _affected_by_multi_selection == null:
+			_handle_click(event.pressed)
+			return
 
-		_drag_initial_pos = position
-		queue_redraw()
+		for x in _affected_by_multi_selection._selected_nodes:
+			if !(x is Draggable):
+				continue
+
+			x._handle_click(event.pressed)
+
+
+func _universal_input(input_resize_direction : Vector2, drag_amount : Vector2):
+	var is_diagonal := absi(input_resize_direction.x) + absi(input_resize_direction.y) == 2
+	if input_resize_direction.x != 0:
+		_size_buffered.x += drag_amount.x * input_resize_direction.x
+
+	if input_resize_direction.y != 0:
+		_size_buffered.y += drag_amount.y * input_resize_direction.y
+
+	var pos_change := Vector2.ZERO
+	if (is_diagonal || input_resize_direction.x == 0) && input_resize_direction.y <= 0 && _size_buffered.y >= get_combined_minimum_size().y:
+		pos_change.y = drag_amount.y
+
+	if (is_diagonal || input_resize_direction.y == 0) && input_resize_direction.x <= 0 && _size_buffered.x >= get_combined_minimum_size().x:
+		pos_change.x = drag_amount.x
+
+	position += get_transform().basis_xform(pos_change)
+	size = _size_buffered
+	queue_redraw()
+
+
+func _handle_click(button_pressed : bool):
+	_mouse_dragging = button_pressed
+	_size_buffered = size
+	if !_mouse_dragging:
+		var result_rect := get_rect_after_drop()
+		position = result_rect.position
+		size = result_rect.size
+		drag_ended.emit()
+
+	_drag_initial_pos = position
+	queue_redraw()
 
 
 func _on_mouse_entered():

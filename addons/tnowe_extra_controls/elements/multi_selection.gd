@@ -97,6 +97,9 @@ func box_end(global_pos : Vector2):
 ## - If held and node is unselected, adds node to selection.[br]
 ## - If held and node is selected, removes node from selection.[br]
 func single_select(node : Node):
+	if node is InterpolatedContainer || node is Draggable:
+		node._affected_by_multi_selection = self
+
 	if !_modifier_pressed:
 		if (!_selected_nodes.has(node)):
 			var node_was_selected := false
