@@ -1,10 +1,12 @@
-[gd_scene load_steps=9 format=3 uid="uid://dalf3ei7chg62"]
+[gd_scene load_steps=10 format=3 uid="uid://dalf3ei7chg62"]
 
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/interpolated_container/interpolated_flow_container.gd" id="1_2xacy"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/draggable.gd" id="1_huoov"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/interpolated_container/container_quantity_keeper.gd" id="2_eo1o4"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/interpolated_container/interpolated_box_container.gd" id="3_w4jrf"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/multi_selection.gd" id="5_qse41"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_npo5b"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_are3d"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
@@ -39,17 +41,34 @@ func _pressed():
 [node name="Box" type="Node"]
 metadata/_edit_lock_ = true
 
-[node name="Selection" type="Control" parent="." node_paths=PackedStringArray("targets")]
-layout_mode = 3
+[node name="TabContainer" type="TabContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_npo5b")
+current_tab = 0
+metadata/_edit_lock_ = true
+
+[node name="Multi-Select Contents" type="Control" parent="TabContainer" node_paths=PackedStringArray("targets")]
+layout_mode = 2
 script = ExtResource("5_qse41")
-targets = [NodePath("../Containers/PanelContainer5/InterpolatedBoxContainer"), NodePath("../Containers/PanelContainer6/InterpolatedBoxContainer"), NodePath("../Containers/PanelContainer4/InterpolatedBoxContainer"), NodePath("../Containers/PanelContainer3/Flow"), NodePath("../Containers/Duplicator/Flow"), NodePath("../Containers/PanelContainer/Flow"), NodePath("../Containers/Quant/Flow")]
+targets = [NodePath("../../Containers/PanelContainer5/InterpolatedBoxContainer"), NodePath("../../Containers/PanelContainer6/InterpolatedBoxContainer"), NodePath("../../Containers/PanelContainer4/InterpolatedBoxContainer"), NodePath("../../Containers/PanelContainer3/Flow"), NodePath("../../Containers/Duplicator/Flow"), NodePath("../../Containers/PanelContainer/Flow"), NodePath("../../Containers/Quant/Flow")]
 style_selection_box = SubResource("StyleBoxFlat_are3d")
 style_selected = SubResource("StyleBoxFlat_p7hng")
+metadata/_edit_lock_ = true
+metadata/_tab_index = 0
+
+[node name="Multi-Select Containers" type="Control" parent="TabContainer" node_paths=PackedStringArray("targets")]
+visible = false
+layout_mode = 2
+script = ExtResource("5_qse41")
+targets = [NodePath("../../Containers")]
+style_selection_box = SubResource("StyleBoxFlat_are3d")
+style_selected = SubResource("StyleBoxFlat_p7hng")
+metadata/_edit_lock_ = true
+metadata/_tab_index = 1
 
 [node name="Containers" type="Control" parent="."]
 layout_mode = 3
@@ -64,9 +83,9 @@ metadata/_edit_lock_ = true
 [node name="Quant" type="PanelContainer" parent="Containers"]
 layout_mode = 0
 offset_left = 33.0
-offset_top = 32.0
+offset_top = 56.0
 offset_right = 366.0
-offset_bottom = 328.0
+offset_bottom = 352.0
 script = ExtResource("1_huoov")
 resize_margin = Vector2(8, 8)
 resize_margin_offset_children = false
@@ -222,9 +241,9 @@ text = "2"
 [node name="PanelContainer3" type="PanelContainer" parent="Containers"]
 layout_mode = 0
 offset_left = 63.0
-offset_top = 336.0
+offset_top = 360.0
 offset_right = 511.0
-offset_bottom = 584.0
+offset_bottom = 608.0
 rotation = 0.251256
 scale = Vector2(1.05672, 0.660246)
 script = ExtResource("1_huoov")
@@ -286,9 +305,9 @@ text = "6"
 [node name="PanelContainer4" type="PanelContainer" parent="Containers"]
 layout_mode = 0
 offset_left = 476.0
-offset_top = 72.0
+offset_top = 90.0
 offset_right = 928.0
-offset_bottom = 136.0
+offset_bottom = 154.0
 script = ExtResource("1_huoov")
 resize_margin = Vector2(8, 0)
 
@@ -466,18 +485,19 @@ size_flags_vertical = 4
 text = "5"
 
 [node name="Label" type="Label" parent="."]
-offset_left = 540.0
+offset_left = 538.0
 offset_top = 13.0
-offset_right = 869.0
-offset_bottom = 36.0
+offset_right = 867.0
+offset_bottom = 62.0
 text = "Drag and drop between box containers!
-Containers have insert conditions."
+Containers have insert conditions.
+Click and drag to make a Box selection."
 horizontal_alignment = 1
 
 [node name="Label2" type="Label" parent="."]
 self_modulate = Color(1, 1, 1, 0.439216)
 offset_left = 35.0
-offset_top = 6.0
+offset_top = 32.0
 offset_right = 364.0
 offset_bottom = 55.0
 text = "Compressor of duplicates"
