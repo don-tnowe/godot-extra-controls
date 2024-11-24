@@ -98,6 +98,10 @@ func get_rect_after_drop() -> Rect2:
 		if grid_snap_affects_resize:
 			result_size = (size + grid_snap_offset_cur).snapped(grid_snap)
 
+	var xform_basis := get_transform().translated(-position)
+	var xformed_rect := (xform_basis * Rect2(Vector2.ZERO, result_size))
+	var xformed_position := xformed_rect.position + result_position
+	var xformed_size := xformed_rect.size
 	if constrain_rect_to_parent:
 		var parent := get_parent()
 		if parent is Control:
@@ -114,17 +118,17 @@ func get_rect_after_drop() -> Rect2:
 
 				result_size.y = parent_size.y
 
-			if result_position.x < 0.0:
-				result_position.x = 0.0
+			if xformed_position.x < 0.0:
+				result_position -= xform_basis.affine_inverse() * Vector2(xformed_position.x, 0.0)
 
-			if result_position.y < 0.0:
-				result_position.y = 0.0
+			if xformed_position.y < 0.0:
+				result_position -= xform_basis.affine_inverse() * Vector2(0.0, xformed_position.y)
 
-			if result_position.x > parent_size.x - result_size.x:
-				result_position.x = parent_size.x - result_size.x
+			if xformed_position.x > parent_size.x - xformed_size.x:
+				result_position -= xform_basis.affine_inverse() * Vector2(xformed_position.x - (parent_size.x - xformed_size.x), 0.0)
 
-			if result_position.y > parent_size.y - result_size.y:
-				result_position.y = parent_size.y - result_size.y
+			if xformed_position.y > parent_size.y - xformed_size.y:
+				result_position -= xform_basis.affine_inverse() * Vector2(0.0, xformed_position.y - (parent_size.y - xformed_size.y))
 
 	if !can_drag_horizontal:
 		result_position.x = _drag_initial_pos.x
