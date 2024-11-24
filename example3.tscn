@@ -1,9 +1,10 @@
-[gd_scene load_steps=12 format=3 uid="uid://dalf3ei7chg62"]
+[gd_scene load_steps=13 format=3 uid="uid://dalf3ei7chg62"]
 
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/interpolated_container/interpolated_flow_container.gd" id="1_2xacy"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/draggable.gd" id="1_huoov"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/interpolated_container/container_quantity_keeper.gd" id="2_eo1o4"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/interpolated_container/interpolated_box_container.gd" id="3_w4jrf"]
+[ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/interpolated_container/interpolated_free_container.gd" id="5_j54m3"]
 [ext_resource type="Script" path="res://addons/tnowe_extra_controls/elements/multi_selection.gd" id="5_qse41"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_npo5b"]
@@ -80,7 +81,7 @@ visible = false
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_uy2t8")
 script = ExtResource("5_qse41")
-targets = [NodePath("../../Containers/VBox/InterpolatedBoxContainer"), NodePath("../../Containers/HBox2/InterpolatedBoxContainer"), NodePath("../../Containers/HBox1/InterpolatedBoxContainer"), NodePath("../../Containers/FlowRS/Flow"), NodePath("../../Containers/Duplicator/Flow"), NodePath("../../Containers/FlowR/Flow"), NodePath("../../Containers/Quant/Flow")]
+targets = [NodePath("../../Containers/VBox/InterpolatedBoxContainer"), NodePath("../../Containers/HBox2/InterpolatedBoxContainer"), NodePath("../../Containers/HBox1/InterpolatedBoxContainer"), NodePath("../../Containers/FlowRS/Flow"), NodePath("../../Containers/Duplicator/Flow"), NodePath("../../Containers/FlowR/Flow"), NodePath("../../Containers/Quant/Flow"), NodePath("../../Containers/Free/Free")]
 style_selection_box = SubResource("StyleBoxFlat_are3d")
 style_selected = SubResource("StyleBoxFlat_p7hng")
 metadata/_edit_lock_ = true
@@ -130,7 +131,6 @@ script = ExtResource("1_2xacy")
 easing_factor = 0.2
 allow_drag_transfer = true
 allow_drag_insert = true
-drag_insert_condition = "get_class() == \"Button\""
 drag_insert_call_on_success = "print(\"Inserted! \", text)"
 metadata/_edit_lock_ = true
 
@@ -184,7 +184,6 @@ alignment = 1
 easing_factor = 0.2
 allow_drag_transfer = true
 allow_drag_insert = true
-drag_insert_condition = "get_class() == \"Button\""
 drag_insert_call_on_success = "print(\"Inserted! \", text)"
 metadata/_edit_lock_ = true
 
@@ -227,6 +226,76 @@ layout_mode = 2
 size_flags_vertical = 4
 text = "6"
 
+[node name="Free" type="PanelContainer" parent="Containers"]
+layout_mode = 0
+offset_left = 378.0
+offset_top = 417.0
+offset_right = 641.0
+offset_bottom = 643.0
+scale = Vector2(0.78, 0.78)
+script = ExtResource("1_huoov")
+resize_margin = Vector2(8, 8)
+resize_margin_offset_children = false
+
+[node name="Free" type="Container" parent="Containers/Free"]
+custom_minimum_size = Vector2(128.56, 196)
+layout_mode = 2
+script = ExtResource("5_j54m3")
+grid_snap = Vector2(16, 16)
+allow_drag_transfer = true
+allow_drag_insert = true
+drag_insert_call_on_success = "print(\"Inserted, and free! \", text)"
+metadata/_edit_lock_ = true
+
+[node name="Button3" type="Button" parent="Containers/Free/Free"]
+self_modulate = Color(0.694118, 0.694118, 1, 1)
+custom_minimum_size = Vector2(128.56, 39.82)
+layout_mode = 2
+size_flags_vertical = 4
+text = "1"
+
+[node name="Container" type="Container" parent="Containers/Free/Free"]
+layout_mode = 2
+mouse_filter = 0
+script = ExtResource("1_huoov")
+resize_margin = Vector2(4, 4)
+
+[node name="Button4" type="Button" parent="Containers/Free/Free/Container"]
+self_modulate = Color(0.694118, 0.694118, 1, 1)
+custom_minimum_size = Vector2(128.56, 39.82)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+text = "D1"
+
+[node name="Container2" type="Container" parent="Containers/Free/Free"]
+custom_minimum_size = Vector2(93.66, 85.04)
+layout_mode = 2
+mouse_filter = 0
+script = ExtResource("1_huoov")
+resize_margin = Vector2(4, 4)
+
+[node name="Button5" type="Button" parent="Containers/Free/Free/Container2"]
+self_modulate = Color(0.694118, 0.694118, 1, 1)
+custom_minimum_size = Vector2(95.66, 84.84)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+text = "D2"
+
+[node name="Button" type="Button" parent="Containers/Free/Free"]
+self_modulate = Color(0.694118, 0.694118, 1, 1)
+custom_minimum_size = Vector2(93.48, 66.54)
+layout_mode = 2
+size_flags_vertical = 4
+text = "2"
+
+[node name="Button6" type="Button" parent="Containers/Free/Free"]
+self_modulate = Color(0.694118, 0.694118, 1, 1)
+custom_minimum_size = Vector2(64, 96)
+layout_mode = 2
+text = "3"
+
 [node name="Duplicator" type="PanelContainer" parent="Containers"]
 layout_mode = 0
 offset_left = 920.0
@@ -253,7 +322,6 @@ alignment = 1
 easing_factor = 0.2
 allow_drag_transfer = true
 allow_drag_insert = true
-drag_insert_condition = "get_class() == \"Button\""
 drag_insert_call_on_success = "print(\"Inserted! \", text)"
 metadata/_edit_lock_ = true
 
@@ -284,7 +352,6 @@ alignment = 2
 easing_factor = 0.2
 allow_drag_transfer = true
 allow_drag_insert = true
-drag_insert_condition = "get_class() == \"Button\""
 drag_insert_call_on_success = "print(\"Inserted! \", text)"
 metadata/_edit_lock_ = true
 
@@ -546,4 +613,4 @@ offset_right = 922.999
 offset_bottom = 266.0
 text = "Order these three (by text)"
 script = SubResource("GDScript_1nia2")
-to_sort = Array[NodePath]([NodePath("../Containers/HBox1"), NodePath("../Containers/HBox2"), NodePath("../Containers/VBox")])
+to_sort = Array[NodePath]([NodePath("../Containers/HBox1/InterpolatedBoxContainer"), NodePath("../Containers/HBox2/InterpolatedBoxContainer"), NodePath("../Containers/VBox/InterpolatedBoxContainer")])

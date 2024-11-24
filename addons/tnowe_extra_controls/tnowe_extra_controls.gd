@@ -21,6 +21,7 @@ var element_scripts := [
 	["RadialContainerTheme", preload(elements_dir + "radial_container_theme.gd"), null],
 	["InterpolatedFlowContainer", preload(elements_dir + "interpolated_container/interpolated_flow_container.gd"), null],
 	["InterpolatedBoxContainer", preload(elements_dir + "interpolated_container/interpolated_box_container.gd"), null],
+	["InterpolatedFreeContainer", preload(elements_dir + "interpolated_container/interpolated_free_container.gd"), null],
 	["ContainerQuantityKeeper", preload(elements_dir + "interpolated_container/container_quantity_keeper.gd"), null],
 	["Draggable", preload(elements_dir + "draggable.gd"), null],
 	["ConnectionLine", preload(elements_dir + "connection_line.gd"), null],

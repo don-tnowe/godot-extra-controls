@@ -34,7 +34,7 @@ signal drag_ended()
 		queue_sort()
 ## Defines if this node can only be resized to multiples of [member grid_snap].
 @export var grid_snap_affects_resize := true
-## Defines if this node can not be dragged or resized beyond the parent control's bounds.
+## Defines if this node can not be dragged or resized beyond the parent control's bounds. In [InterpolatedFreeContainer], this is forced.
 @export var constrain_rect_to_parent := true
 
 var _mouse_over := false
@@ -43,6 +43,7 @@ var _mouse_dragging_direction := Vector2i.ZERO
 var _drag_initial_pos := Vector2.ZERO
 var _size_buffered := Vector2.ZERO
 var _affected_by_multi_selection : MultiSelection
+var _affected_by_free_container : InterpolatedFreeContainer
 
 
 func _init():
@@ -52,20 +53,32 @@ func _init():
 
 func _enter_tree():
 	update_configuration_warnings()
+	_affected_by_free_container = null
+	if get_parent() is InterpolatedFreeContainer:
+		_affected_by_free_container = get_parent()
+
+	# Force release the node; changing parents is rather buggy
+	_handle_click(false)
+	if get_parent() is InterpolatedContainer:
+		get_parent().force_release()
 
 
 func _get_configuration_warnings() -> PackedStringArray:
-	if get_parent() is InterpolatedContainer:
+	if get_parent() is InterpolatedContainer && !(get_parent() is InterpolatedFreeContainer):
 		return ["This Draggable is inside of an InterpolatedContainer! The two classes implement separate features, and are incompatible:\n- InterpolatedContainer can have children of any other Control type. Keep it if you need a container for nodes with a way to reorder them and transfer to other containers. \n- Draggable can have a parent of any other type. Keep it if you need free drag-and-drop on a 2D plane."]
 
 	return []
 
 
 func _draw():
+	var used_drop_color := drop_color if (
+			_affected_by_free_container == null || !_affected_by_free_container.drop_color_override_children
+		) else _affected_by_free_container.drop_color
+
 	if _mouse_dragging:
 		var result_rect := get_rect_after_drop()
 		result_rect.position -= position
-		draw_rect(result_rect, drop_color)
+		draw_rect(result_rect, used_drop_color)
 
 	elif _mouse_over:
 		var result_rect := Rect2(Vector2.ZERO, resize_margin)
@@ -81,28 +94,29 @@ func _draw():
 		if _mouse_dragging_direction.x == 0:
 			result_rect.size.x = size.x
 
-		draw_rect(result_rect, drop_color)
+		draw_rect(result_rect, used_drop_color)
 
 
 func get_rect_after_drop() -> Rect2:
-	var grid_snap_offset_cur := grid_snap * 0.5 - Vector2.ONE
+	var used_grid_snap := grid_snap if _affected_by_free_container == null else _affected_by_free_container.grid_snap
+	var grid_snap_offset_cur := used_grid_snap * 0.5 - Vector2.ONE
 	var result_position := position
 	var result_size := size
-	if grid_snap != Vector2.ZERO:
+	if used_grid_snap != Vector2.ZERO:
 		if _mouse_dragging_direction != Vector2i.ZERO:
-			result_position = (result_position - grid_snap * 0.5).snapped(grid_snap)
+			result_position = (result_position - used_grid_snap * 0.5).snapped(used_grid_snap)
 
 		else:
-			result_position = result_position.snapped(grid_snap)
+			result_position = result_position.snapped(used_grid_snap)
 
 		if grid_snap_affects_resize:
-			result_size = (size + grid_snap_offset_cur).snapped(grid_snap)
+			result_size = (size + grid_snap_offset_cur).snapped(used_grid_snap)
 
 	var xform_basis := get_transform().translated(-position)
 	var xformed_rect := (xform_basis * Rect2(Vector2.ZERO, result_size))
 	var xformed_position := xformed_rect.position + result_position
 	var xformed_size := xformed_rect.size
-	if constrain_rect_to_parent:
+	if constrain_rect_to_parent || _affected_by_free_container != null:
 		var parent := get_parent()
 		if parent is Control:
 			var parent_size : Vector2 = get_parent().size
@@ -227,8 +241,10 @@ func _handle_click(button_pressed : bool):
 	_size_buffered = size
 	if !_mouse_dragging:
 		var result_rect := get_rect_after_drop()
-		position = result_rect.position
-		size = result_rect.size
+		if _affected_by_free_container == null:
+			position = result_rect.position
+			size = result_rect.size
+
 		drag_ended.emit()
 
 	_drag_initial_pos = position
@@ -243,6 +259,19 @@ func _on_mouse_entered():
 func _on_mouse_exited():
 	_mouse_over = false
 	queue_redraw()
+
+
+func _get_minimum_size() -> Vector2:
+	var result_size := Vector2(0.0, 0.0)
+	for x in get_children(true):
+		if x is Control:
+			result_size.x = maxf(result_size.x, x.get_combined_minimum_size().x)
+			result_size.y = maxf(result_size.y, x.get_combined_minimum_size().y)
+
+	if resize_margin_offset_children:
+		result_size += resize_margin + resize_margin
+
+	return result_size
 
 
 func _notification(what : int):

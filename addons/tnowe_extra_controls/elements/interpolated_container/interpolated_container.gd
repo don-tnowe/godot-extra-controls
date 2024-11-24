@@ -118,6 +118,13 @@ func sort_children_by_expression(expr : Callable):
 		if children[i].get_index() != i:
 			children[i].get_parent().move_child(children[i], i)
 
+## Forcibly releases children that are being dragged.
+func force_release():
+	drag_ended.emit(_dragging_node)
+	_dragging_node = null
+	queue_sort()
+	set_process_input(false)
+
 
 func _process(delta : float):
 	if move_time == 0.0:
@@ -156,7 +163,9 @@ func _input(event : InputEvent):
 		return
 
 	if event is InputEventMouseMotion && _dragging_node != null:
-		_dragging_node.global_position += event.relative
+		if !(_dragging_node is Draggable):
+			_dragging_node.global_position += event.relative
+
 		drag_moved.emit(_dragging_node)
 		if allow_drag_reorder:
 			_insert_child_at_position(_dragging_node)
@@ -172,7 +181,9 @@ func _input(event : InputEvent):
 				# CanvasItem doesn't actually have a global position, but both subclasses do.
 				continue
 
-			x.global_position += event.relative
+			if !(x is Draggable):
+				x.global_position += event.relative
+
 			drag_moved.emit(x)
 			if allow_drag_transfer && !Rect2(Vector2.ZERO, size).has_point(get_global_transform().affine_inverse() * event.global_position):
 				_insert_child_in_other(x, event.global_position)
