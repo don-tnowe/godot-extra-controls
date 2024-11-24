@@ -41,7 +41,7 @@ func _draw() -> void:
 
 	for x in _selected_nodes:
 		if x is Control:
-			draw_set_transform_matrix(x.get_global_transform() * xform)
+			draw_set_transform_matrix(xform * x.get_global_transform())
 			draw_style_box(style_selected, Rect2(Vector2.ZERO, x.size).grow(style_selected_margin))
 
 ## Start the selection box at the specified position.
