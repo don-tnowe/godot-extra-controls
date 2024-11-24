@@ -40,7 +40,7 @@ func _draw() -> void:
 		draw_style_box(style_selection_box, Rect2(_box_corner_start, _box_corner_end - _box_corner_start).abs())
 
 	for x in _selected_nodes:
-		if x is Control:
+		if is_instance_valid(x) && x is Control:
 			draw_set_transform_matrix(xform * x.get_global_transform())
 			draw_style_box(style_selected, Rect2(Vector2.ZERO, x.size).grow(style_selected_margin))
 
