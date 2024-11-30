@@ -6,6 +6,13 @@ extends Control
 
 const _style_offsets : Array[float] = [0.0, 1.0, 0.5, 0.5]
 
+## Emitted when a path point is created by user input, possible if [member allow_point_creation] is enabled.
+signal path_point_added(point_index : int, point_position : Vector2)
+## Emitted when a path point is moved by user input.
+signal path_point_moved(point_index : int, point_position : Vector2)
+## Emitted when a path point is removed by user input, possible if [member allow_point_creation] is enabled.
+signal path_point_removed(point_index : int, point_position : Vector2)
+
 ## Node that will connect to the beginning of the line.
 @export var connect_node1 : CanvasItem:
 	set(v):
@@ -436,6 +443,7 @@ func _gui_input(event : InputEvent):
 	if event is InputEventMouseMotion:
 		if _mouse_dragging >= 0:
 			path_set(_mouse_dragging, event.position + position)
+			path_point_moved.emit(_mouse_dragging, event.position + position)
 
 	if event is InputEventMouseButton && event.button_index == MOUSE_BUTTON_LEFT:
 		var mouse_point : Vector2 = event.position
@@ -481,6 +489,7 @@ func _gui_input(event : InputEvent):
 				var new_point_position : Vector2 = event.position + position
 				if _mouse_dragging >= 0 && _mouse_dragging < _path_curve.point_count:
 					path_set(_mouse_dragging, new_point_position)
+					path_point_moved.emit(_mouse_dragging, new_point_position)
 					if !allow_point_creation:
 						return
 
@@ -491,17 +500,23 @@ func _gui_input(event : InputEvent):
 								remove_start = _mouse_dragging + 1
 
 							for remove_i in absi(_mouse_dragging - i):
+								var old_pos := _path_curve.get_point_position(remove_start)
 								path_remove(remove_start)
+								path_point_removed.emit(remove_start, old_pos)
 
 							break
 
 					if connect_point1.distance_squared_to(new_point_position) < drag_hint_radius * drag_hint_radius:
 						for remove_i in _mouse_dragging + 1:
+							var old_pos := _path_curve.get_point_position(remove_i)
 							path_remove(remove_i)
+							path_point_removed.emit(remove_i, old_pos)
 
 					if connect_point2.distance_squared_to(new_point_position) < drag_hint_radius * drag_hint_radius:
 						for remove_i in _path_curve.point_count - _mouse_dragging:
+							var old_pos := _path_curve.get_point_position(_mouse_dragging)
 							path_remove(_mouse_dragging)
+							path_point_removed.emit(_mouse_dragging, old_pos)
 
 			if succeeded_on != null:
 				var drag_reattach_call_on_success_expr := Expression.new()
@@ -528,6 +543,7 @@ func _gui_input(event : InputEvent):
 				pt_overlapping = _get_overlapped_path_midpoint(event.position + position)
 				if pt_overlapping != -1:
 					path_add(pt_overlapping, event.position + position)
+					path_point_added.emit(pt_overlapping, event.position + position)
 					_mouse_dragging = pt_overlapping
 
 
