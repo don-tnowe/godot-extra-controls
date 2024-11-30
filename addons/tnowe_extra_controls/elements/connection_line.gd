@@ -85,7 +85,7 @@ signal path_point_removed(point_index : int, point_position : Vector2)
 @export var drag_hint_radius := 8.0
 
 var _mouse_over := false
-var _mouse_dragging := 0
+var _mouse_dragging := -1
 var _label_clickable_rect := Rect2()
 var _path_curve : Curve2D
 var _last_rect1 := Rect2()
