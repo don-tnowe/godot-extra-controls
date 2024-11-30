@@ -229,6 +229,9 @@ func _draw():
 			draw_circle(_path_curve.get_point_position(pt_under_mouse), drag_hint_radius, drag_hint_color)
 			return
 
+		if !allow_point_creation:
+			return
+
 		pt_under_mouse = _get_overlapped_path_midpoint(mouse_point)
 		if pt_under_mouse != -1:
 			var prev_point_pos := line_start
@@ -241,7 +244,7 @@ func _draw():
 
 			draw_circle((prev_point_pos + next_point_pos) * 0.5, drag_hint_radius, drag_hint_color)
 
-	elif _is_in_radius((line_start + line_end) * 0.5, mouse_point):
+	elif _is_in_radius((line_start + line_end) * 0.5, mouse_point) && allow_point_creation:
 		draw_circle((line_start + line_end) * 0.5, drag_hint_radius, drag_hint_color)
 
 ## Add a point to the path, in this node's parent's local coordinates. Index 0 is the first point [b]after[/b] the start point.
@@ -475,7 +478,30 @@ func _gui_input(event : InputEvent):
 
 			else:
 				# TODO: Grid Snap
-				path_set(_mouse_dragging, event.position + position)
+				var new_point_position : Vector2 = event.position + position
+				if _mouse_dragging >= 0 && _mouse_dragging < _path_curve.point_count:
+					path_set(_mouse_dragging, new_point_position)
+					if !allow_point_creation:
+						return
+
+					for i in _path_curve.point_count:
+						if _mouse_dragging != i && _path_curve.get_point_position(i).distance_squared_to(new_point_position) < drag_hint_radius * drag_hint_radius:
+							var remove_start := i
+							if _mouse_dragging < i:
+								remove_start = _mouse_dragging + 1
+
+							for remove_i in absi(_mouse_dragging - i):
+								path_remove(remove_start)
+
+							break
+
+					if connect_point1.distance_squared_to(new_point_position) < drag_hint_radius * drag_hint_radius:
+						for remove_i in _mouse_dragging + 1:
+							path_remove(remove_i)
+
+					if connect_point2.distance_squared_to(new_point_position) < drag_hint_radius * drag_hint_radius:
+						for remove_i in _path_curve.point_count - _mouse_dragging:
+							path_remove(_mouse_dragging)
 
 			if succeeded_on != null:
 				var drag_reattach_call_on_success_expr := Expression.new()
@@ -498,10 +524,11 @@ func _gui_input(event : InputEvent):
 				_mouse_dragging = pt_overlapping
 				return
 
-			pt_overlapping = _get_overlapped_path_midpoint(event.position + position)
-			if pt_overlapping != -1:
-				path_add(pt_overlapping, event.position + position)
-				_mouse_dragging = pt_overlapping
+			if allow_point_creation:
+				pt_overlapping = _get_overlapped_path_midpoint(event.position + position)
+				if pt_overlapping != -1:
+					path_add(pt_overlapping, event.position + position)
+					_mouse_dragging = pt_overlapping
 
 
 func _on_mouse_entered():
