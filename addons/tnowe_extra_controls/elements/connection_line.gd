@@ -531,7 +531,7 @@ func _gui_input(event : InputEvent):
 					connect_node2 = succeeded_on
 
 			else:
-				if _mouse_dragging >= 0 && _mouse_dragging < _path_curve.point_count:
+				if _mouse_dragging >= 0 && (_path_curve == null || _mouse_dragging < _path_curve.point_count):
 					path_point_moved.emit(_mouse_dragging, mouse_point)
 					if !allow_point_creation:
 						return
