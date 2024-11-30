@@ -512,7 +512,6 @@ func _gui_input(event : InputEvent):
 				drag_reattach_condition_expr = null
 
 			if _mouse_dragging == -2:
-				print(_connect_node1_parent)
 				succeeded_on = _get_overlapped_control(_connect_node1_parent, connect_node2, event.global_position, drag_reattach_condition_expr, expr_params)
 				if succeeded_on == null && allow_loose_placement:
 					connect_node1 = null
@@ -530,8 +529,8 @@ func _gui_input(event : InputEvent):
 				if succeeded_on != null:
 					connect_node2 = succeeded_on
 
-			else:
-				if _mouse_dragging >= 0 && (_path_curve == null || _mouse_dragging < _path_curve.point_count):
+			elif _path_curve != null:
+				if _mouse_dragging >= 0 && _mouse_dragging < _path_curve.point_count:
 					path_point_moved.emit(_mouse_dragging, mouse_point)
 					if !allow_point_creation:
 						return
