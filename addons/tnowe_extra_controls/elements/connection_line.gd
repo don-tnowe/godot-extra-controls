@@ -519,9 +519,7 @@ func _gui_input(event : InputEvent):
 					connect_node2 = succeeded_on
 
 			else:
-				# TODO: Grid Snap
 				if _mouse_dragging >= 0 && _mouse_dragging < _path_curve.point_count:
-					path_set(_mouse_dragging, mouse_point)
 					path_point_moved.emit(_mouse_dragging, mouse_point)
 					if !allow_point_creation:
 						return
@@ -545,11 +543,34 @@ func _gui_input(event : InputEvent):
 							path_remove(remove_i)
 							path_point_removed.emit(remove_i, old_pos)
 
-					if connect_point2.distance_squared_to(mouse_point) < drag_hint_radius * drag_hint_radius:
+					elif connect_point2.distance_squared_to(mouse_point) < drag_hint_radius * drag_hint_radius:
 						for remove_i in _path_curve.point_count - _mouse_dragging:
 							var old_pos := _path_curve.get_point_position(_mouse_dragging)
 							path_remove(_mouse_dragging)
 							path_point_removed.emit(_mouse_dragging, old_pos)
+
+					else:
+						# Snap to grid and constrain to endpoint parents. Only if the point wasn't deleted when placed.
+						var result_point := mouse_point
+						if _connect_node1_parent != null && _connect_node1_parent is InterpolatedFreeContainer:
+							result_point = result_point.snapped(_connect_node1_parent.grid_snap)
+							result_point = result_point.clamp(Vector2.ZERO, _connect_node1_parent.size)
+
+						elif connect_node1 != null && connect_node1 is Draggable:
+							result_point = result_point.snapped(connect_node1.grid_snap)
+							if connect_node1.constrain_rect_to_parent:
+								result_point = result_point.clamp(Vector2.ZERO, _connect_node1_parent.size)
+
+						if _connect_node2_parent != null && _connect_node2_parent is InterpolatedFreeContainer:
+							result_point = result_point.snapped(_connect_node2_parent.grid_snap)
+							result_point = result_point.clamp(Vector2.ZERO, _connect_node2_parent.size)
+
+						elif connect_node2 != null && connect_node2 is Draggable:
+							result_point = result_point.snapped(connect_node2.grid_snap)
+							if connect_node2.constrain_rect_to_parent:
+								result_point = result_point.clamp(Vector2.ZERO, _connect_node2_parent.size)
+
+						path_set(_mouse_dragging, result_point)
 
 			if succeeded_on != null:
 				var drag_reattach_call_on_success_expr := Expression.new()
