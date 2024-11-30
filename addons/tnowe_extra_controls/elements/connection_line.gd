@@ -207,8 +207,13 @@ func _draw():
 	else:
 		_draw_line_textured(line_start, line_end, line_direction_backward, line_direction_forward)
 
-	_draw_arrow(line_end, line_start, end_style1)
-	_draw_arrow(line_start, line_end, end_style2)
+	if _path_curve == null:
+		_draw_arrow(line_end, line_start, end_style1)
+		_draw_arrow(line_start, line_end, end_style2)
+
+	else:
+		_draw_arrow(_path_curve.get_point_position(0), line_start, end_style1)
+		_draw_arrow(_path_curve.get_point_position(_path_curve.point_count - 1), line_end, end_style2)
 
 	# Drag Area Hint
 	if allow_drag_pt1 && _is_in_radius(line_start, mouse_point):
