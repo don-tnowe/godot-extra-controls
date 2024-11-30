@@ -108,7 +108,7 @@ func _process(delta : float):
 
 
 func _has_point(point : Vector2) -> bool:
-	if !Rect2(Vector2.ZERO, size).grow(drag_hint_radius).has_point(point):
+	if !Rect2(Vector2.ZERO, size).has_point(point):
 		return false
 
 	if allow_drag_pt1 && _is_in_radius(connect_point1 - position, point):
@@ -118,13 +118,14 @@ func _has_point(point : Vector2) -> bool:
 		return true
 
 	if _path_curve != null:
-		if _get_overlapped_path_point(point + global_position) != -1:
+		if _get_overlapped_path_point(point + position) != -1:
 			return true
 
-		if (point + global_position).distance_squared_to(_path_curve.get_closest_point(point + position)) <= line_width * line_width:
-			return true
+		# TODO: block mouse input when pointer is on the line
+		# if (point + position).distance_squared_to(_path_curve.get_closest_point(point + position)) <= line_width * line_width:
+		# 	return true
 
-	if allow_point_creation && _get_overlapped_path_midpoint(point + global_position) != -1:
+	if allow_point_creation && _get_overlapped_path_midpoint(point + position) != -1:
 		return true
 
 	return false
@@ -223,12 +224,12 @@ func _draw():
 		draw_circle(line_end, drag_hint_radius, drag_hint_color)
 
 	if _path_curve != null:
-		var pt_under_mouse := _get_overlapped_path_point(get_global_mouse_position())
+		var pt_under_mouse := _get_overlapped_path_point(mouse_point)
 		if pt_under_mouse != -1:
 			draw_circle(_path_curve.get_point_position(pt_under_mouse), drag_hint_radius, drag_hint_color)
 			return
 
-		pt_under_mouse = _get_overlapped_path_midpoint(get_global_mouse_position())
+		pt_under_mouse = _get_overlapped_path_midpoint(mouse_point)
 		if pt_under_mouse != -1:
 			var prev_point_pos := line_start
 			var next_point_pos := line_end
@@ -396,38 +397,32 @@ func _is_in_radius(circle_center : Vector2, point : Vector2):
 	return circle_center.distance_squared_to(point) <= drag_hint_radius * drag_hint_radius
 
 
-func _get_overlapped_path_point(point_global : Vector2) -> int:
-	if get_parent() is CanvasItem:
-		point_global = get_parent().get_global_transform().affine_inverse() * point_global
-
+func _get_overlapped_path_point(point_in_parent : Vector2) -> int:
 	if _path_curve == null:
 		return -1
 
 	for i in _path_curve.point_count:
-		if _is_in_radius(_path_curve.get_point_position(i), point_global):
+		if _is_in_radius(_path_curve.get_point_position(i), point_in_parent):
 			return i
 
 	return -1
 
 
-func _get_overlapped_path_midpoint(point_global : Vector2) -> int:
-	if get_parent() is CanvasItem:
-		point_global = get_parent().get_global_transform().affine_inverse() * point_global
-
+func _get_overlapped_path_midpoint(point_in_parent : Vector2) -> int:
 	if _path_curve == null:
-		return 0 if _is_in_radius((connect_point1 + connect_point2) * 0.5, point_global) else -1
+		return 0 if _is_in_radius((connect_point1 + connect_point2) * 0.5, point_in_parent) else -1
 
 	var prev_position := connect_point1
 	var next_position := Vector2.ZERO
 	for i in _path_curve.point_count:
 		next_position = _path_curve.get_point_position(i)
-		if _is_in_radius((prev_position + next_position) * 0.5, point_global):
+		if _is_in_radius((prev_position + next_position) * 0.5, point_in_parent):
 			return i
 
 		prev_position = next_position
 
 	next_position = connect_point2
-	if _is_in_radius((prev_position + next_position) * 0.5, point_global):
+	if _is_in_radius((prev_position + next_position) * 0.5, point_in_parent):
 		return _path_curve.point_count
 
 	return -1
@@ -498,12 +493,12 @@ func _gui_input(event : InputEvent):
 			_mouse_dragging = -3
 
 		else:
-			var pt_overlapping := _get_overlapped_path_point(event.global_position)
+			var pt_overlapping := _get_overlapped_path_point(event.position + position)
 			if pt_overlapping != -1:
 				_mouse_dragging = pt_overlapping
 				return
 
-			pt_overlapping = _get_overlapped_path_midpoint(event.global_position)
+			pt_overlapping = _get_overlapped_path_midpoint(event.position + position)
 			if pt_overlapping != -1:
 				path_add(pt_overlapping, event.position + position)
 				_mouse_dragging = pt_overlapping
