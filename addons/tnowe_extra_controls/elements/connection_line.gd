@@ -13,21 +13,29 @@ signal path_point_moved(point_index : int, point_position : Vector2)
 ## Emitted when a path point is removed by user input, possible if [member allow_point_creation] is enabled.
 signal path_point_removed(point_index : int, point_position : Vector2)
 
-## Node that will connect to the beginning of the line.
+## Node that will connect to the beginning of the line. May be empty if [member connect_point1] is set.
 @export var connect_node1 : CanvasItem:
 	set(v):
 		connect_node1 = v
 		queue_redraw()
 		set_process(redraw_every_frame)
-## Node that will connect to the end of the line.
+		if v != null:
+			if !v.is_inside_tree(): await ready
+			_connect_node1_parent = v.get_parent()
+## Node that will connect to the end of the line. May be empty if [member connect_point2] is set.
 @export var connect_node2 : CanvasItem:
 	set(v):
 		connect_node2 = v
 		queue_redraw()
 		set_process(redraw_every_frame)
-## The beginning of the line, in parent's local coordinates. If a [member connect_node1] is provided, this will be the calculated beginning point.
+		if v != null:
+			if !v.is_inside_tree(): await ready
+			_connect_node2_parent = v.get_parent()
+## The beginning of the line, in parent's local coordinates. If a [member connect_node1] is provided, this will be the calculated beginning point.[br]
+## [b]Warning:[/b] if you set this on initialization and [member allow_drag_pt1] is active, you must call [method update_endpoint_pools].
 @export var connect_point1 := Vector2()
-## The end of the line, in parent's local coordinates. If a [member connect_node2] is provided, this will be the calculated end point.
+## The end of the line, in parent's local coordinates. If a [member connect_node2] is provided, this will be the calculated end point.[br]
+## [b]Warning:[/b] if you set this on initialization and [member allow_drag_pt2] is active, you must call [method update_endpoint_pools].
 @export var connect_point2 := Vector2()
 
 @export_group("Behaviour")
@@ -37,6 +45,8 @@ signal path_point_removed(point_index : int, point_position : Vector2)
 @export var allow_drag_pt2 := false
 ## Allow dragging the middle of a segment between points to create a new point, as well as dragging a point onto another to remove all points in between.
 @export var allow_point_creation := false
+## Allow placement of end and begginning points at a place with no Control underneath. This disconnects the point from its current connected node.
+@export var allow_loose_placement := false
 ## Whether to redraw the line every [code]_process()[/code]. Otherwise, update it with [method CanvasItem.queue_redraw].
 @export var redraw_every_frame := true:
 	set(v):
@@ -80,6 +90,8 @@ var _label_clickable_rect := Rect2()
 var _path_curve : Curve2D
 var _last_rect1 := Rect2()
 var _last_rect2 := Rect2()
+var _connect_node1_parent : Node
+var _connect_node2_parent : Node
 
 
 func _init():
@@ -139,19 +151,22 @@ func _has_point(point : Vector2) -> bool:
 
 
 func _draw():
-	var xform_start := Transform2D(Vector2(1.0, 0.0), Vector2(0.0, 1.0), connect_point1 + global_position)
-	var xform_end := Transform2D(Vector2(1.0, 0.0), Vector2(0.0, 1.0), connect_point2 + global_position)
+	var xform_start := Transform2D(Vector2(1.0, 0.0), Vector2(0.0, 1.0), connect_point1)
+	var xform_end := Transform2D(Vector2(1.0, 0.0), Vector2(0.0, 1.0), connect_point2)
+	var parent_xform_inv : Transform2D = Transform2D.IDENTITY
+	if get_parent() is CanvasItem:
+		parent_xform_inv = get_parent().get_global_transform().affine_inverse()
+		xform_start.origin -= parent_xform_inv.origin
+		xform_end.origin -= parent_xform_inv.origin
+
 	if connect_node1 != null:
 		xform_start = connect_node1.get_global_transform()
 
 	if connect_node2 != null:
 		xform_end = connect_node2.get_global_transform()
 
-	var parent_xform_inv : Transform2D = Transform2D.IDENTITY
-	if get_parent() is CanvasItem:
-		parent_xform_inv = get_parent().get_global_transform().affine_inverse()
-		xform_start = parent_xform_inv * xform_start
-		xform_end = parent_xform_inv * xform_end
+	xform_start = parent_xform_inv * xform_start
+	xform_end = parent_xform_inv * xform_end
 
 	# Determine line endpoints
 	var line_start := xform_start.origin
@@ -288,6 +303,11 @@ func path_clear():
 ## Returns the number of points in the path, not including end points.
 func path_get_count(index : int) -> int:
 	return 0 if _path_curve == null else _path_curve.point_count
+
+## Manually updates the nodes whose children this line can be attached to via [member allow_drag_pt1] and [member allow_drag_pt2].
+func update_endpoint_pools(parent1 : Node, parent2 : Node):
+	_connect_node1_parent = parent1
+	_connect_node2_parent = parent2
 
 ## Utility function to get a point on the intersection of the [code]rect[/code]'s border and the ray cast from its center in [code]direction[/code].
 static func get_rect_edge_position(rect : Rect2, direction : Vector2, margin : float = 0.0) -> Vector2:
@@ -438,6 +458,25 @@ func _get_overlapped_path_midpoint(point_in_parent : Vector2) -> int:
 	return -1
 
 
+func _get_overlapped_control(of_parent : Node, ignore_node : Node, global_point : Vector2, drag_reattach_condition_expr : Expression, expr_params : Array) -> Control:
+	if of_parent == null:
+		return null
+
+	if of_parent is CanvasItem:
+		global_point = of_parent.get_global_transform().affine_inverse() * global_point
+
+	for x in of_parent.get_children():
+		if x == ignore_node || !(x is Control) || !x.get_rect().has_point(global_point):
+			continue
+
+		if drag_reattach_condition_expr != null && !drag_reattach_condition_expr.execute(expr_params, x):
+			continue
+
+		return x
+
+	return null
+
+
 func _gui_input(event : InputEvent):
 	queue_redraw()
 	if event is InputEventMouseMotion:
@@ -461,40 +500,34 @@ func _gui_input(event : InputEvent):
 				drag_reattach_condition_expr = null
 
 			if _mouse_dragging == -2:
-				for x in connect_node1.get_parent().get_children():
-					if x == connect_node2 || !(x is Control) || !x.get_rect().has_point(mouse_point):
-						continue
+				print(_connect_node1_parent)
+				succeeded_on = _get_overlapped_control(_connect_node1_parent, connect_node2, event.global_position, drag_reattach_condition_expr, expr_params)
+				if succeeded_on == null && allow_loose_placement:
+					connect_node1 = null
+					connect_point1 = event.position + position
 
-					if drag_reattach_condition_expr != null && !drag_reattach_condition_expr.execute(expr_params, x):
-						continue
-
-					connect_node1 = x
-					succeeded_on = x
-					break
+				if succeeded_on != null:
+					connect_node1 = succeeded_on
 
 			elif _mouse_dragging == -3:
-				for x in connect_node2.get_parent().get_children():
-					if x == connect_node1 || !(x is Control) || !x.get_rect().has_point(mouse_point):
-						continue
+				succeeded_on = _get_overlapped_control(_connect_node2_parent, connect_node1, event.global_position, drag_reattach_condition_expr, expr_params)
+				if succeeded_on == null && allow_loose_placement:
+					connect_node2 = null
+					connect_point2 = event.position + position
 
-					if drag_reattach_condition_expr != null && !drag_reattach_condition_expr.execute(expr_params, x):
-						continue
-
-					connect_node2 = x
-					succeeded_on = x
-					break
+				if succeeded_on != null:
+					connect_node2 = succeeded_on
 
 			else:
 				# TODO: Grid Snap
-				var new_point_position : Vector2 = event.position + position
 				if _mouse_dragging >= 0 && _mouse_dragging < _path_curve.point_count:
-					path_set(_mouse_dragging, new_point_position)
-					path_point_moved.emit(_mouse_dragging, new_point_position)
+					path_set(_mouse_dragging, mouse_point)
+					path_point_moved.emit(_mouse_dragging, mouse_point)
 					if !allow_point_creation:
 						return
 
 					for i in _path_curve.point_count:
-						if _mouse_dragging != i && _path_curve.get_point_position(i).distance_squared_to(new_point_position) < drag_hint_radius * drag_hint_radius:
+						if _mouse_dragging != i && _path_curve.get_point_position(i).distance_squared_to(mouse_point) < drag_hint_radius * drag_hint_radius:
 							var remove_start := i
 							if _mouse_dragging < i:
 								remove_start = _mouse_dragging + 1
@@ -506,13 +539,13 @@ func _gui_input(event : InputEvent):
 
 							break
 
-					if connect_point1.distance_squared_to(new_point_position) < drag_hint_radius * drag_hint_radius:
+					if connect_point1.distance_squared_to(mouse_point) < drag_hint_radius * drag_hint_radius:
 						for remove_i in _mouse_dragging + 1:
 							var old_pos := _path_curve.get_point_position(remove_i)
 							path_remove(remove_i)
 							path_point_removed.emit(remove_i, old_pos)
 
-					if connect_point2.distance_squared_to(new_point_position) < drag_hint_radius * drag_hint_radius:
+					if connect_point2.distance_squared_to(mouse_point) < drag_hint_radius * drag_hint_radius:
 						for remove_i in _path_curve.point_count - _mouse_dragging:
 							var old_pos := _path_curve.get_point_position(_mouse_dragging)
 							path_remove(_mouse_dragging)

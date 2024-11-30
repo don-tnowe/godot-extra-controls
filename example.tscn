@@ -188,10 +188,10 @@ color = Color(1, 1, 1, 0.0509804)
 [node name="Draggable3" type="Container" parent="Control/ScrollZoomViewDemo/ScrollZoomView/Control"]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
-offset_left = 60.0
-offset_top = 36.0
-offset_right = 156.0
-offset_bottom = 164.0
+offset_left = 64.0
+offset_top = 32.0
+offset_right = 160.0
+offset_bottom = 160.0
 mouse_filter = 0
 script = ExtResource("1_eddsv")
 grid_snap = Vector2(32, 32)
@@ -259,10 +259,9 @@ horizontal_alignment = 1
 [node name="Draggable" type="Container" parent="Control/ScrollZoomViewDemo/ScrollZoomView/Control"]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
-offset_left = 106.0
-offset_top = 276.0
-offset_right = 266.0
-offset_bottom = 468.0
+offset_left = 96.0
+offset_right = 256.0
+offset_bottom = 192.0
 mouse_filter = 0
 script = ExtResource("1_eddsv")
 can_drag_vertical = false
@@ -308,10 +307,9 @@ color = Color(1, 1, 1, 0.5)
 [node name="Draggable2" type="Container" parent="Control/ScrollZoomViewDemo/ScrollZoomView/Control"]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
-offset_left = 410.0
-offset_top = 36.0
-offset_right = 634.0
-offset_bottom = 260.0
+offset_top = 32.0
+offset_right = 224.0
+offset_bottom = 256.0
 mouse_filter = 0
 script = ExtResource("1_eddsv")
 can_drag_horizontal = false
@@ -326,21 +324,26 @@ layout_mode = 2
 mouse_filter = 2
 color = Color(1, 0.792, 0.255, 0.5)
 
-[node name="Line" type="Control" parent="Control/ScrollZoomViewDemo/ScrollZoomView/Control" node_paths=PackedStringArray("connect_node1", "connect_node2")]
+[node name="Connections" type="Control" parent="Control/ScrollZoomViewDemo/ScrollZoomView/Control"]
+anchors_preset = 0
+metadata/_edit_lock_ = true
+
+[node name="Line" type="Control" parent="Control/ScrollZoomViewDemo/ScrollZoomView/Control/Connections" node_paths=PackedStringArray("connect_node1", "connect_node2")]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 150.0
-offset_top = 97.7971
-offset_right = 416.0
-offset_bottom = 142.783
+offset_left = 104.0
+offset_top = 22.0
+offset_right = 120.0
+offset_bottom = 170.0
 script = ExtResource("9_axav4")
-connect_node1 = NodePath("../Draggable3")
-connect_node2 = NodePath("../Draggable2")
-connect_point1 = Vector2(158, 105.797)
-connect_point2 = Vector2(408, 134.783)
+connect_node1 = NodePath("../../Draggable3")
+connect_node2 = NodePath("../../Draggable2")
+connect_point1 = Vector2(112, 162)
+connect_point2 = Vector2(112, 30)
 allow_drag_pt1 = true
 allow_drag_pt2 = true
 allow_point_creation = true
+allow_loose_placement = true
 drag_reattach_call_on_success = "print(\"Connected to: \", name)"
 end_style1 = 2
 
