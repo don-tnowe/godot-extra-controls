@@ -166,6 +166,7 @@ metadata/_edit_lock_ = true
 
 [node name="ScrollZoomView" type="MarginContainer" parent="Control/ScrollZoomViewDemo"]
 clip_contents = true
+custom_minimum_size = Vector2(706, 524)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -175,9 +176,11 @@ grow_vertical = 2
 mouse_filter = 0
 mouse_force_pass_scroll_events = false
 script = ExtResource("1_pmqwv")
-child_size = Vector2(768, 576)
+pan_button = 6
+child_size = Vector2(706, 524)
 
 [node name="Control" type="ColorRect" parent="Control/ScrollZoomViewDemo/ScrollZoomView"]
+custom_minimum_size = Vector2(706, 524)
 layout_mode = 2
 mouse_filter = 2
 color = Color(1, 1, 1, 0.0509804)
@@ -185,10 +188,10 @@ color = Color(1, 1, 1, 0.0509804)
 [node name="Draggable3" type="Container" parent="Control/ScrollZoomViewDemo/ScrollZoomView/Control"]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
-offset_left = 69.0
-offset_top = 20.0
-offset_right = 165.0
-offset_bottom = 180.0
+offset_left = 60.0
+offset_top = 36.0
+offset_right = 156.0
+offset_bottom = 164.0
 mouse_filter = 0
 script = ExtResource("1_eddsv")
 grid_snap = Vector2(32, 32)
@@ -256,10 +259,10 @@ horizontal_alignment = 1
 [node name="Draggable" type="Container" parent="Control/ScrollZoomViewDemo/ScrollZoomView/Control"]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
-offset_left = 213.0
-offset_top = 128.0
-offset_right = 309.0
-offset_bottom = 384.0
+offset_left = 106.0
+offset_top = 276.0
+offset_right = 266.0
+offset_bottom = 468.0
 mouse_filter = 0
 script = ExtResource("1_eddsv")
 can_drag_vertical = false
@@ -305,10 +308,10 @@ color = Color(1, 1, 1, 0.5)
 [node name="Draggable2" type="Container" parent="Control/ScrollZoomViewDemo/ScrollZoomView/Control"]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
-offset_left = 416.0
-offset_top = 64.0
-offset_right = 480.0
-offset_bottom = 160.0
+offset_left = 410.0
+offset_top = 36.0
+offset_right = 634.0
+offset_bottom = 260.0
 mouse_filter = 0
 script = ExtResource("1_eddsv")
 can_drag_horizontal = false
@@ -326,15 +329,18 @@ color = Color(1, 0.792, 0.255, 0.5)
 [node name="Line" type="Control" parent="Control/ScrollZoomViewDemo/ScrollZoomView/Control" node_paths=PackedStringArray("connect_node1", "connect_node2")]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 167.0
-offset_top = 101.813
-offset_right = 414.0
-offset_bottom = 110.768
+offset_left = 150.0
+offset_top = 97.7971
+offset_right = 416.0
+offset_bottom = 142.783
 script = ExtResource("9_axav4")
 connect_node1 = NodePath("../Draggable3")
 connect_node2 = NodePath("../Draggable2")
+connect_point1 = Vector2(158, 105.797)
+connect_point2 = Vector2(408, 134.783)
 allow_drag_pt1 = true
 allow_drag_pt2 = true
+allow_point_creation = true
 drag_reattach_call_on_success = "print(\"Connected to: \", name)"
 end_style1 = 2
 
