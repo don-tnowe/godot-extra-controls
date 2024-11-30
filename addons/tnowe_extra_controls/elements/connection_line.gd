@@ -300,9 +300,21 @@ func path_clear():
 	_path_curve = null
 	queue_redraw()
 
-## Returns the number of points in the path, not including end points.
-func path_get_count(index : int) -> int:
+## Returns the number of points in the path, not including [member connect_point1] and [member connect_point2].
+func path_get_count() -> int:
 	return 0 if _path_curve == null else _path_curve.point_count
+
+## Returns a copy of this node's array of path points, not including [member connect_point1] and [member connect_point2].
+func path_get_points() -> Array[Vector2]:
+	if _path_curve == null:
+		return []
+
+	var result : Array[Vector2] = []
+	result.resize(_path_curve.point_count)
+	for i in result.size():
+		result[i] = _path_curve.get_point_position(i)
+
+	return result
 
 ## Manually updates the nodes whose children this line can be attached to via [member allow_drag_pt1] and [member allow_drag_pt2].
 func update_endpoint_pools(parent1 : Node, parent2 : Node):
