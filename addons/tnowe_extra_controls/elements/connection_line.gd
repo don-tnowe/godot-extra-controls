@@ -37,6 +37,10 @@ signal path_point_removed(point_index : int, point_position : Vector2)
 ## The end of the line, in parent's local coordinates. If a [member connect_node2] is provided, this will be the calculated end point.[br]
 ## [b]Warning:[/b] if you set this on initialization and [member allow_drag_pt2] is active, you must call [method update_endpoint_pools].
 @export var connect_point2 := Vector2()
+## The beginning of the line will get anchored to this position, between 0 and 1, within [member connect_node1]'s [Control] rectangle. Using [code](0.5, 0.5)[/code] will anchor the line to the node's center.
+@export var connect_anchor1 := Vector2(0.5, 0.5)
+## The end of the line will get anchored to this position, between 0 and 1, within [member connect_node2]'s [Control] rectangle. Using [code](0.5, 0.5)[/code] will anchor the line to the node's center.
+@export var connect_anchor2 := Vector2(0.5, 0.5)
 
 @export_group("Behaviour")
 ## Allow dragging the beginning (point 1) of the line to connect it to another node, changing [member connect_node1]. Only works on [Control] targets.
@@ -172,10 +176,10 @@ func _draw():
 	var line_start := xform_start.origin
 	var line_end := xform_end.origin
 	if connect_node1 is Control:
-		line_start += xform_start.basis_xform_inv(connect_node1.size * 0.5)
+		line_start += xform_start.basis_xform_inv(connect_node1.size * connect_anchor1)
 
 	if connect_node2 is Control:
-		line_end += xform_end.basis_xform_inv(connect_node2.size * 0.5)
+		line_end += xform_end.basis_xform_inv(connect_node2.size * connect_anchor2)
 
 	var line_direction_forward := (line_end - line_start).normalized()
 	var line_direction_backward := (line_start - line_end).normalized()
@@ -185,18 +189,37 @@ func _draw():
 
 	# Turn center positions into edge positions (if applicable)
 	if connect_node1 is Control && !(connect_node1 is ConnectionLine):
-		line_start = xform_start * get_rect_edge_position(
-			Rect2(Vector2.ZERO, connect_node1.size),
-			xform_start.basis_xform_inv(-line_direction_backward).normalized(),
-			connection_margin,
-		)
+		if connect_anchor1 == Vector2(0.5, 0.5):
+			line_start = xform_start * get_rect_edge_position(
+				Rect2(Vector2.ZERO, connect_node1.size),
+				xform_start.basis_xform_inv(-line_direction_backward).normalized(),
+				connection_margin,
+			)
+
+		else:
+			line_start = xform_start * get_rect_edge_position_ratio(
+				Rect2(Vector2.ZERO, connect_node1.size),
+				xform_start.basis_xform_inv(-line_direction_backward).normalized(),
+				connection_margin,
+				connect_anchor1,
+			)
 
 	if connect_node2 is Control && !(connect_node2 is ConnectionLine):
-		line_end = xform_end * get_rect_edge_position(
-			Rect2(Vector2.ZERO, connect_node2.size),
-			xform_end.basis_xform_inv(-line_direction_forward).normalized(),
-			connection_margin,
-		)
+		if connect_anchor2 == Vector2(0.5, 0.5):
+			line_end = xform_end * get_rect_edge_position(
+				Rect2(Vector2.ZERO, connect_node2.size),
+				xform_end.basis_xform_inv(-line_direction_forward).normalized(),
+				connection_margin,
+			)
+
+		else:
+			line_end = xform_end * get_rect_edge_position_ratio(
+				Rect2(Vector2.ZERO, connect_node2.size),
+				xform_end.basis_xform_inv(-line_direction_forward).normalized(),
+				connection_margin,
+				connect_anchor2,
+			)
+			
 
 	# Correction if resulting path is too short
 	if line_start.distance_squared_to(line_end) < line_min_length * line_min_length:
@@ -321,15 +344,32 @@ func update_endpoint_pools(parent1 : Node, parent2 : Node):
 	_connect_node1_parent = parent1
 	_connect_node2_parent = parent2
 
-## Utility function to get a point on the intersection of the [code]rect[/code]'s border and the ray cast from its center in [code]direction[/code].
+## Utility function to get a point on the intersection of the [code]rect[/code]'s border and the ray cast from a 0-1 position [code]ratio[/code] in [code]direction[/code]. [br]
+static func get_rect_edge_position_ratio(rect : Rect2, direction : Vector2, margin : float = 0.0, ratio : Vector2 = Vector2(0.5, 0.5)) -> Vector2:
+	var rect_size := rect.size + Vector2(margin, margin)
+	var direction_sign := direction.sign()
+	# Farther from the target edge = rect appears larger.
+	rect_size *= Vector2(0.5, 0.5) + (Vector2(0.5, 0.5) - ratio) * direction_sign
+	var use_vertical := absf(direction.y) > rect_size.y / rect_size.length()
+	if use_vertical:
+		direction *= rect_size.y / absf(direction.y)
+
+	else:
+		direction *= rect_size.x / absf(direction.x)
+
+	return rect.position + rect.size * ratio + direction + (ratio - Vector2(0.5, 0.5)) * margin
+
+
+## Utility function to get a point on the intersection of the [code]rect[/code]'s border and the ray cast from its center in [code]direction[/code]. [br]
+## Equivalent to calling [method get_rect_edge_position_ratio] with [code]ratio = (0.5, 0.5)[/code].
 static func get_rect_edge_position(rect : Rect2, direction : Vector2, margin : float = 0.0) -> Vector2:
 	var rect_size := rect.size + Vector2(margin, margin)
 	var use_vertical := absf(direction.y) > rect_size.y / rect_size.length()
 	if use_vertical:
-		direction *= 1.0 / absf(direction.y) * rect_size.y * 0.5
+		direction *= rect_size.y / absf(direction.y) * 0.5
 
 	else:
-		direction *= 1.0 / absf(direction.x) * rect_size.x * 0.5
+		direction *= rect_size.x / absf(direction.x) * 0.5
 
 	return rect.position + rect.size * 0.5 + direction
 
