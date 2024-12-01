@@ -357,7 +357,7 @@ static func get_rect_edge_position_ratio(rect : Rect2, direction : Vector2, marg
 	else:
 		direction *= rect_size.x / absf(direction.x)
 
-	return rect.position + rect.size * ratio + direction + (ratio - Vector2(0.5, 0.5)) * margin
+	return rect.position + rect.size * ratio + direction
 
 
 ## Utility function to get a point on the intersection of the [code]rect[/code]'s border and the ray cast from its center in [code]direction[/code]. [br]
