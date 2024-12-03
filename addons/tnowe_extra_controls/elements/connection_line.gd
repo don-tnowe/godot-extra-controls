@@ -378,28 +378,46 @@ func _draw_line_textured(line_start : Vector2, line_end : Vector2, line_directio
 	var line_start_poly := line_start - line_direction_backward * line_arrow_size.y * _style_offsets[end_style1]
 	var line_end_poly := line_end - line_direction_forward * line_arrow_size.y * _style_offsets[end_style2]
 	if _path_curve == null:
-		var length_in_textures := 1.0
-		if line_texture_tile:
-			length_in_textures = (line_end_poly - line_start_poly).length() * (float(line_texture.get_height()) / line_texture.get_width()) / line_width
-
-		var line_direction_rotated := Vector2(-line_direction_forward.y, line_direction_forward.x) * line_width * 0.5
-		draw_colored_polygon(
-			[
-				line_end_poly - line_direction_rotated,
-				line_end_poly + line_direction_rotated,
-				line_start_poly + line_direction_rotated,
-				line_start_poly - line_direction_rotated,
-			], line_color, [
-				Vector2(length_in_textures, 0.0),
-				Vector2(length_in_textures, 1.0),
-				Vector2(0.0, 1.0),
-				Vector2(0.0, 0.0),
-			], line_texture
-		)
+		_draw_single_segment_textured(line_start_poly, line_end_poly, line_direction_forward)
 
 	else:
-		# TODO: textured line if there is a path 
-		_draw_line_untextured(line_start, line_end, line_direction_backward, line_direction_forward)
+		_draw_single_segment_textured(
+			line_start_poly,
+			_path_curve.get_point_position(0),
+			line_direction_backward,
+		)
+		draw_circle(_path_curve.get_point_position(0), line_width * 0.5, line_color)
+		for i in _path_curve.point_count - 1:
+			_draw_single_segment_textured(
+				_path_curve.get_point_position(i),
+				_path_curve.get_point_position(i + 1),
+				_path_curve.get_point_position(i).direction_to(_path_curve.get_point_position(i + 1)),
+			)
+			draw_circle(_path_curve.get_point_position(i + 1), line_width * 0.5, line_color)
+
+		_draw_single_segment_textured(
+			_path_curve.get_point_position(_path_curve.point_count - 1),
+			line_end_poly,
+			line_direction_forward,
+		)
+
+
+func _draw_single_segment_textured(line_start_poly : Vector2, line_end_poly : Vector2, line_direction : Vector2):
+	var length_in_textures := (line_end_poly - line_start_poly).length() * (float(line_texture.get_height()) / line_texture.get_width()) / line_width
+	var line_direction_rotated := Vector2(-line_direction.y, line_direction.x) * line_width * 0.5
+	draw_colored_polygon(
+		[
+			line_end_poly - line_direction_rotated,
+			line_end_poly + line_direction_rotated,
+			line_start_poly + line_direction_rotated,
+			line_start_poly - line_direction_rotated,
+		], line_color, [
+			Vector2(length_in_textures, 0.0),
+			Vector2(length_in_textures, 1.0),
+			Vector2(0.0, 1.0),
+			Vector2(0.0, 0.0),
+		], line_texture
+	)
 
 
 func _draw_line_untextured(line_start : Vector2, line_end : Vector2, line_direction_backward : Vector2, line_direction_forward : Vector2):
