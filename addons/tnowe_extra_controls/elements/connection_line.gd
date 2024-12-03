@@ -339,6 +339,25 @@ func path_get_points() -> Array[Vector2]:
 
 	return result
 
+## Sample a [code]0-1[/code] value on the path, with additional path points taken into account. [code]0.5[/code] returns the middle position, [code]0[/code] returns the start position, [code]1[/code] returns the end position.
+func path_sample(unit_progress : float) -> Vector2:
+	if _path_curve == null:
+		return lerp(connect_point1, connect_point2, unit_progress)
+
+	var vec_first := _path_curve.get_point_position(0) - connect_point1
+	var vec_last := _path_curve.get_point_position(_path_curve.get_point_count() - 1) - connect_point2
+	var length_first := vec_first.length()
+	var length_last := vec_last.length()
+	var length_total := length_first + _path_curve.get_baked_length() + length_last
+	var px_progress := length_total * unit_progress
+	if px_progress < length_first:
+		return connect_point1 + px_progress * vec_first.normalized()
+
+	elif px_progress > length_total - length_last:
+		return connect_point2 + (length_total - px_progress) * vec_last.normalized()
+
+	return _path_curve.sample_baked(px_progress - length_first)
+
 ## Manually updates the nodes whose children this line can be attached to via [member allow_drag_pt1] and [member allow_drag_pt2].
 func update_endpoint_pools(parent1 : Node, parent2 : Node):
 	_connect_node1_parent = parent1
