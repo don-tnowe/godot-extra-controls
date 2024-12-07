@@ -344,6 +344,7 @@ allow_drag_pt1 = true
 allow_drag_pt2 = true
 allow_point_creation = true
 allow_loose_placement = true
+line_blocks_input = true
 drag_reattach_call_on_success = "print(\"Connected to: \", name)"
 end_style1 = 2
 
