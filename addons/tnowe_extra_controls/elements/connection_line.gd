@@ -134,19 +134,33 @@ func _has_point(point : Vector2) -> bool:
 	if !Rect2(Vector2.ZERO, size).has_point(point):
 		return false
 
-	if allow_drag_pt1 && _is_in_radius(connect_point1 - position, point):
+	point += position
+	if allow_drag_pt1 && _is_in_radius(connect_point1, point):
 		return true
 
-	if allow_drag_pt2 && _is_in_radius(connect_point2 - position, point):
+	if allow_drag_pt2 && _is_in_radius(connect_point2, point):
 		return true
 
 	if _path_curve != null:
 		if _get_overlapped_path_point(point + position) != -1:
 			return true
 
-		# TODO: block mouse input when pointer is on the line
-		# if (point + position).distance_squared_to(_path_curve.get_closest_point(point + position)) <= line_width * line_width:
-		# 	return true
+		if line_blocks_input:
+			var half_width := line_width * 0.5
+			if get_distance_to_segment(connect_point2, _path_curve.get_point_position(_path_curve.point_count - 1), point) <= half_width:
+				return true
+
+			var last_pt_position := connect_point1
+			var current_pt_position := Vector2()
+			for i in _path_curve.point_count:
+				current_pt_position = _path_curve.get_point_position(i)
+				if get_distance_to_segment(last_pt_position, current_pt_position, point) <= half_width:
+					return true
+
+				last_pt_position = current_pt_position
+
+	elif line_blocks_input && get_distance_to_segment(connect_point1, connect_point2, point) <= line_width * 0.5:
+		return true
 
 	if allow_point_creation && _get_overlapped_path_midpoint(point + position) != -1:
 		return true
@@ -378,7 +392,6 @@ static func get_rect_edge_position_ratio(rect : Rect2, direction : Vector2, marg
 
 	return rect.position + rect.size * ratio + direction
 
-
 ## Utility function to get a point on the intersection of the [code]rect[/code]'s border and the ray cast from its center in [code]direction[/code]. [br]
 ## Equivalent to calling [method get_rect_edge_position_ratio] with [code]ratio = (0.5, 0.5)[/code].
 static func get_rect_edge_position(rect : Rect2, direction : Vector2, margin : float = 0.0) -> Vector2:
@@ -391,6 +404,12 @@ static func get_rect_edge_position(rect : Rect2, direction : Vector2, margin : f
 		direction *= rect_size.x / absf(direction.x) * 0.5
 
 	return rect.position + rect.size * 0.5 + direction
+
+## Utility function to get the distance from the given point to the closest point to it on a line segment.
+static func get_distance_to_segment(pt1 : Vector2, pt2 : Vector2, distance_to_pt : Vector2) -> float:
+	var dist1 := pt1.distance_to(distance_to_pt)
+	var prod := (pt2 - pt1).normalized().cross((distance_to_pt - pt1).normalized())
+	return absf(dist1 * prod)
 
 
 func _draw_line_textured(line_start : Vector2, line_end : Vector2, line_direction_backward : Vector2, line_direction_forward : Vector2):
