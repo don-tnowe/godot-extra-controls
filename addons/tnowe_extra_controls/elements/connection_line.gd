@@ -51,6 +51,8 @@ signal path_point_removed(point_index : int, point_position : Vector2)
 @export var allow_point_creation := false
 ## Allow placement of end and begginning points at a place with no Control underneath. This disconnects the point from its current connected node.
 @export var allow_loose_placement := false
+## Make the visible line block mouse input, to allow listening for click via [signal Control.gui_input].
+@export var line_blocks_input := false
 ## Whether to redraw the line every [code]_process()[/code]. Otherwise, update it with [method CanvasItem.queue_redraw].
 @export var redraw_every_frame := true:
 	set(v):
@@ -276,6 +278,9 @@ func _draw():
 		_draw_arrow(_path_curve.get_point_position(_path_curve.point_count - 1), line_end, end_style2)
 
 	# Drag Area Hint
+	if !_mouse_over:
+		return
+
 	if allow_drag_pt1 && _is_in_radius(line_start, mouse_point):
 		draw_circle(line_start, drag_hint_radius, drag_hint_color)
 
