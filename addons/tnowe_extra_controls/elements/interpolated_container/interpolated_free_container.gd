@@ -35,7 +35,7 @@ func _draw():
 
 
 func _sort_children():
-	for child in get_children():
+	for child in get_children(true):
 		if child is Control && child != _dragging_node:
 			fit_interpolated(child, get_rect_after_drop(child))
 

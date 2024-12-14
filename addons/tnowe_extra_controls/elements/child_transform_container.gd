@@ -49,7 +49,7 @@ func _get_minimum_size():
 	var found_minsize = Vector2.ZERO
 
 	if !minsize_from_child_xform:
-		for x in get_children():
+		for x in get_children(true):
 			if !x is Control: continue
 			var x_cast : Control = x
 			var x_minsize := x_cast.get_combined_minimum_size()
@@ -60,7 +60,7 @@ func _get_minimum_size():
 
 		return found_minsize
 
-	for x in get_children():
+	for x in get_children(true):
 		if !x is Control: continue
 		var x_cast : Control = x
 		var x_minsize := (child_rotation_xform * Rect2(Vector2.ZERO, x_cast.get_combined_minimum_size() * child_scale)).size
@@ -74,7 +74,7 @@ func _get_minimum_size():
 
 func _notification(what : int):
 	if what == NOTIFICATION_SORT_CHILDREN:
-		for x in get_children():
+		for x in get_children(true):
 			if x is Control:
 				sort_child(x)
 

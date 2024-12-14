@@ -18,7 +18,7 @@ var _group_stack := []
 
 ## Removes all property editors.
 func clear():
-	for x in get_children():
+	for x in get_children(true):
 		x.queue_free()
 
 	_keys.clear()

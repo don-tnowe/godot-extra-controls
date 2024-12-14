@@ -17,7 +17,7 @@ var _total_row_height := 0.0
 
 
 func _sort_children():
-	var child_count := get_child_count()
+	var child_count := get_child_count(true)
 	_separation = Vector2(get_theme_constant(&"h_separation", &"FlowContainer"), get_theme_constant(&"v_separation", &"FlowContainer"))
 	_row_start_child_index.resize(1)
 	_row_tops.resize(1)
@@ -30,7 +30,7 @@ func _sort_children():
 	var children_in_row := 0
 	var cur_child_minsize := Vector2.ZERO
 	var largest_child := 0.0
-	for x in get_children():
+	for x in get_children(true):
 		if !(x is Control && x.visible):
 			continue
 
@@ -75,7 +75,7 @@ func _sort_children():
 
 	_total_row_height = cur_row_top_offset + (cur_row_height if children_in_row > 0 else 0.0)
 	_row_tops.append(_total_row_height)
-	_row_start_child_index.append(get_child_count())
+	_row_start_child_index.append(get_child_count(true))
 	custom_minimum_size = Vector2(largest_child, _total_row_height)
 
 
@@ -90,7 +90,7 @@ func _fit_children_row(start_child : int, end_child : int, row_top_offset : floa
 
 	for i in end_child - start_child:
 		var child_index := start_child + i
-		var child_testing := get_child(child_index)
+		var child_testing := get_child(child_index, true)
 		if !(child_testing is Control && child_testing.visible):
 			continue
 
@@ -120,7 +120,7 @@ func _insert_child_at_position(child : Control):
 			result_row = i
 			break
 
-	var children := get_children()
+	var children := get_children(true)
 	if result_row == -1:
 		result_row = _row_tops.size() - 2
 

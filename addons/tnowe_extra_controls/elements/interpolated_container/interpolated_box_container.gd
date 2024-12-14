@@ -27,7 +27,7 @@ var _separation := 0.0
 
 
 func _sort_children():
-	var child_count := get_child_count()
+	var child_count := get_child_count(true)
 	_separation = get_theme_constant(&"separation", &"BoxContainer")
 
 	var cur_child_minsize := Vector2.ZERO
@@ -35,7 +35,7 @@ func _sort_children():
 	var widest_child := 0.0
 	var cur_row_expand_count := 0
 	var ordering_direction := Vector2.DOWN if vertical else Vector2.RIGHT
-	for x in get_children():
+	for x in get_children(true):
 		if !(x is Control && x.visible):
 			continue
 
@@ -85,19 +85,19 @@ func _fit_children_row(row_size : Vector2, expand_node_count : int):
 	var compact_factor := 1.0
 	if vertical:
 		if row_size.y > size.y:
-			var last_child_length : float = get_child(get_child_count() - 1).get_combined_minimum_size().y
+			var last_child_length : float = get_child(get_child_count() - 1, true).get_combined_minimum_size().y
 			compact_factor = (size.y - last_child_length) / (row_size.y - last_child_length)
 			cur_offset = 0.0
 			expand_node_count = 0
 
 	else:
 		if row_size.x > size.x:
-			var last_child_length : float = get_child(get_child_count() - 1).get_combined_minimum_size().x
+			var last_child_length : float = get_child(get_child_count() - 1, true).get_combined_minimum_size().x
 			compact_factor = (size.x - last_child_length) / (row_size.x - last_child_length)
 			cur_offset = 0.0
 			expand_node_count = 0
 
-	for child in get_children():
+	for child in get_children(true):
 		if !(child is Control && child.visible):
 			continue
 
@@ -128,7 +128,7 @@ func _fit_children_row(row_size : Vector2, expand_node_count : int):
 
 
 func _insert_child_at_position(child : Control):
-	var children := get_children()
+	var children := get_children(true)
 	var child_former_index := child.get_index()
 	for i in children.size():
 		if !(children[i] is Control && children[i].visible):

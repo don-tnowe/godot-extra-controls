@@ -24,7 +24,7 @@ extends Node
 			if !v.is_inside_tree():
 				await v.ready
 
-			for x in v.get_children().duplicate():
+			for x in v.get_children(true).duplicate():
 				var item_key := _item_key_getter_expr.execute([], x)
 				if !_item_counts.has(item_key):
 					_item_counts[item_key] = 1

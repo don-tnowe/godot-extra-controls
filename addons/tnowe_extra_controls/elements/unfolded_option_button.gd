@@ -30,14 +30,14 @@ signal value_changed(value : int)
 		v = clamp(v, 0, options.size() - 1 if !flags else (1 << options.size()) - 1)
 		value = v
 
-		var child_count = get_child_count()
+		var child_count = get_child_count(true)
 		if (flags):
 			for i in child_count:
-				get_child(i).button_pressed = ((1 << i ) & v) != 0
+				get_child(i, true).button_pressed = ((1 << i ) & v) != 0
 
 		else:
 			for i in child_count:
-				get_child(i).button_pressed = i == v
+				get_child(i, true).button_pressed = i == v
 
 	get: return value
 

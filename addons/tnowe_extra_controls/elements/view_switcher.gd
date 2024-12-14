@@ -29,7 +29,7 @@ func _on_child_visibility_changed(child : CanvasItem):
 
 	_hiding = true;
 	if child.visible:
-		for x in get_children():
+		for x in get_children(true):
 			if (x is CanvasItem):
 				x.hide();
 

@@ -11,7 +11,7 @@ extends MarginContainer
 	set(v):
 		child_size = v
 		if !is_inside_tree(): await ready
-		var child := get_child(0)
+		var child := get_child(0, true)
 		child.size.x = v.x if v.x >= 0.0 else size.x
 		child.size.y = v.y if v.y >= 0.0 else size.y
 ## The minimum and maximum zoom amount.
@@ -37,7 +37,7 @@ extends MarginContainer
 	set(v):
 		scroll_offset = v
 		if !is_inside_tree(): await ready
-		get_child(0).position = v
+		get_child(0, true).position = v
 
 
 var _input_dragging := false
@@ -48,7 +48,7 @@ var _zoom_visible := 1.0:
 	set(v):
 		_zoom_visible = v
 		if !is_inside_tree(): await ready
-		get_child(0).scale = Vector2(v, v)
+		get_child(0, true).scale = Vector2(v, v)
 
 
 func _process(_delta : float):

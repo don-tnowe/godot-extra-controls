@@ -32,7 +32,7 @@ enum RoundingMode {
 
 func _notification(what : int):
 	if what == NOTIFICATION_SORT_CHILDREN:
-		for x in get_children():
+		for x in get_children(true):
 			if x is Control:
 				_scale_child(x)
 

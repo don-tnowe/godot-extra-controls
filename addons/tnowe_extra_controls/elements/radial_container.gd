@@ -188,7 +188,7 @@ func _has_point(point : Vector2):
 func _notification(what : int):
 	if what == NOTIFICATION_SORT_CHILDREN:
 		_child_stretch_ratio_sum = 0.0
-		var children := get_children()
+		var children := get_children(true)
 		var children_visible := 0
 		for x in children:
 			if x is Control && x.visible:

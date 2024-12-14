@@ -96,28 +96,28 @@ func drop_node(node : Control, on_global_position : Vector2):
 		new_c.move_child.call_deferred(virtual_node_above, virtual_node_below.get_index() + index_offset)
 		new_c.queue_sort()
 
-	if previous_container.get_child_count() == 1:
-		_dissolve_container(previous_container.get_child(0))
+	if previous_container.get_child_count(true) == 1:
+		_dissolve_container(previous_container.get_child(0, true))
 
 
 func _get_virtual_node_at(local_position : Vector2, seek_edge : bool = false) -> Control:
-	var current_node := _virtual_tree.get_child(0)
+	var current_node := _virtual_tree.get_child(0, true)
 	local_position -= current_node.position
 	while true:
 		if current_node is HBoxContainer:
-			for x in current_node.get_children():
+			for x in current_node.get_children(true):
 				if x.position.x < local_position.x:
 					current_node = x
 					continue
 
 		if current_node is VBoxContainer:
-			for x in current_node.get_children():
+			for x in current_node.get_children(true):
 				if x.position.y < local_position.y:
 					current_node = x
 					continue
 
 		if current_node is MarginContainer:
-			for x in current_node.get_children():
+			for x in current_node.get_children(true):
 				if x.visible:
 					current_node = x
 					continue
@@ -170,13 +170,13 @@ func _dissolve_container(virtual_node : Control) -> Container:
 		return
 
 	var index_offset := 0
-	for x in v_node_parent.get_children():
+	for x in v_node_parent.get_children(true):
 		x.reparent(v_node_parent_parent)
 		v_node_parent_parent.move_child(x, v_node_index + index_offset)
 		index_offset += 1
 
 	v_node_parent.queue_free()
-	if v_node_parent_parent.get_child_count() <= 1:
+	if v_node_parent_parent.get_child_count(true) <= 1:
 		return _dissolve_container(v_node_parent)
 
 	queue_sort()
@@ -191,7 +191,7 @@ func _get_or_create_virtual(to_node : Control) -> Control:
 		virtual_node.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		virtual_node.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		_node_virtual_counterpart[to_node] = virtual_node
-		_virtual_tree.get_child(0).add_child(virtual_node)
+		_virtual_tree.get_child(0, true).add_child(virtual_node)
 		virtual_node.gui_input.connect(_virtual_node_gui_input.bind(to_node))
 		virtual_node.resized.connect(_position_child.bind(to_node))
 
@@ -210,7 +210,7 @@ func _position_all_children():
 	_virtual_tree.size = size
 	_drop_preview.position = Vector2.ZERO
 	_drop_preview.size = size
-	for x in get_children():
+	for x in get_children(true):
 		if x == _dragging_node:
 			x.z_index = 1
 			continue
@@ -243,8 +243,8 @@ func _gui_input(event : InputEvent):
 	queue_sort.call_deferred()
 	if event is InputEventMouseMotion:
 		if _dragging_container != null:
-			var first_node := _dragging_container.get_child(_dragging_container_edge)
-			var second_node := _dragging_container.get_child(_dragging_container_edge + 1)
+			var first_node := _dragging_container.get_child(_dragging_container_edge, true)
+			var second_node := _dragging_container.get_child(_dragging_container_edge + 1, true)
 			if _dragging_container is HBoxContainer:
 				var ratio_delta : float = event.relative.x / first_node.size.x * first_node.size_flags_stretch_ratio
 				if first_node.size_flags_stretch_ratio == 0.0:
@@ -317,7 +317,7 @@ func _on_child_exited_tree(child : Node):
 	if virtual_node == null:
 		return
 
-	if virtual_node.get_parent().get_child_count() <= 2:
+	if virtual_node.get_parent().get_child_count(true) <= 2:
 		_dissolve_container(virtual_node)
 
 	virtual_node.free()
