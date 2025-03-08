@@ -55,7 +55,7 @@ func _sort_children():
 
 
 	cur_row_length -= _separation
-	var result_size := Vector2(widest_child, cur_row_length) if vertical else Vector2(cur_row_length, widest_child)
+	var result_size := Vector2(size.x, cur_row_length) if vertical else Vector2(cur_row_length, size.y)
 	_fit_children_row(result_size, cur_row_expand_count)
 
 	if compact_if_overflow:
@@ -105,7 +105,7 @@ func _fit_children_row(row_size : Vector2, expand_node_count : int):
 		var cur_child_width := 0.0
 		if vertical:
 			cur_child_width = cur_child.get_combined_minimum_size().y
-			if expand_node_count != 0 && cur_child.size_flags_horizontal & SIZE_EXPAND != 0:
+			if expand_node_count != 0 && cur_child.size_flags_vertical & SIZE_EXPAND != 0:
 				cur_child_width += (size.y - row_size.y) / expand_node_count
 
 		else:
