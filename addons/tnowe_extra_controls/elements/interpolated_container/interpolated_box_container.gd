@@ -24,6 +24,11 @@ extends InterpolatedContainer
 ## Enable reordering by using the mouse pointer.
 
 var _separation := 0.0
+var _cached_minimum_size := Vector2()
+
+
+func _get_minimum_size() -> Vector2:
+	return _cached_minimum_size
 
 
 func _sort_children():
@@ -34,7 +39,6 @@ func _sort_children():
 	var cur_row_length := 0.0
 	var widest_child := 0.0
 	var cur_row_expand_count := 0
-	var ordering_direction := Vector2.DOWN if vertical else Vector2.RIGHT
 	for x in get_children(true):
 		if !(x is Control && x.visible):
 			continue
@@ -59,10 +63,10 @@ func _sort_children():
 	_fit_children_row(result_size, cur_row_expand_count)
 
 	if compact_if_overflow:
-		custom_minimum_size = Vector2(widest_child, 0.0) if vertical else Vector2(0.0, widest_child)
+		_cached_minimum_size = Vector2(widest_child, 0.0) if vertical else Vector2(0.0, widest_child)
 
 	else:
-		custom_minimum_size = result_size
+		_cached_minimum_size = Vector2(widest_child, cur_row_length) if vertical else Vector2(cur_row_length, widest_child)
 
 
 func _fit_children_row(row_size : Vector2, expand_node_count : int):
