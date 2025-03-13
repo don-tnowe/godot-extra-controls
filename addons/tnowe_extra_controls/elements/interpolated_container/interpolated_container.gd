@@ -73,6 +73,9 @@ enum ItemAlignment {
 ## Expression to execute on the node after insertion succeeds. Same parameters as [member drag_insert_condition].
 @export var drag_insert_call_on_success := ""
 
+## Stores this node's minimum size, calculated from child positions. Must be set from [method _sort_children].
+var cached_minimum_size := Vector2()
+
 static var _all_boxes : Array[InterpolatedContainer] = []
 
 var _drag_insert_condition_exp : Expression
@@ -85,13 +88,17 @@ var _interp_progress_factor := 0.0
 var _skip_next_reorder := false
 var _affected_by_multi_selection : MultiSelection
 
+
+func _get_minimum_size() -> Vector2:
+	return cached_minimum_size
+
 ## Override to define the behaviour for dragging a node via drag-and-drop rearrangement. [br]
 ## Should emit [signal order_changed] if the node's index was successfully changed.
 func _insert_child_at_position(child : Control):
 	pass
 
 ## Override to define positions of all child nodes. [br]
-## Must change [member custom_minimum_size] to trigger sorting for parent container. [br]
+## Must change [member cached_minimum_size] to update own size for parent containers. [br]
 ## Must call [method fit_interpolated] on each child to set their position.
 func _sort_children():
 	pass

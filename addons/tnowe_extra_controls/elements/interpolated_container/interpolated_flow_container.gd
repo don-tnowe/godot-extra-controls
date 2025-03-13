@@ -14,11 +14,6 @@ var _row_start_child_index : Array[int] = [0]
 var _row_tops : Array[float] = [0]
 var _separation := Vector2()
 var _total_row_height := 0.0
-var _cached_minimum_size := Vector2()
-
-
-func _get_minimum_size() -> Vector2:
-	return _cached_minimum_size
 
 
 func _sort_children():
@@ -81,7 +76,7 @@ func _sort_children():
 	_total_row_height = cur_row_top_offset + (cur_row_height if children_in_row > 0 else 0.0)
 	_row_tops.append(_total_row_height)
 	_row_start_child_index.append(get_child_count(true))
-	_cached_minimum_size = Vector2(largest_child, _total_row_height)
+	cached_minimum_size = Vector2(largest_child, _total_row_height)
 
 
 func _fit_children_row(start_child : int, end_child : int, row_top_offset : float, row_size : Vector2, expand_node_count : int):
