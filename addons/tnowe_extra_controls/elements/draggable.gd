@@ -81,6 +81,10 @@ func _draw():
 		draw_rect(result_rect, used_drop_color)
 
 	elif _mouse_over:
+		if _mouse_dragging_direction == Vector2i.ZERO:
+			draw_rect(Rect2(Vector2.ZERO, size), used_drop_color)
+			return
+
 		var result_rect := Rect2(Vector2.ZERO, resize_margin)
 		if _mouse_dragging_direction.x == 1:
 			result_rect.position.x = size.x - resize_margin.x
@@ -176,21 +180,22 @@ func _gui_input(event : InputEvent, called_by : Draggable = null):
 			mouse_default_cursor_shape = CURSOR_ARROW
 
 		else:
-			_mouse_dragging_direction.x = (
+			var new_dragging_direction := _mouse_dragging_direction
+			new_dragging_direction.x = (
 				-1
 				if event.position.x < resize_margin.x
 				else 0
 				if event.position.x <= size.x - resize_margin.x
 				else 1
 			)
-			_mouse_dragging_direction.y = (
+			new_dragging_direction.y = (
 				-1
 				if event.position.y < resize_margin.y
 				else 0
 				if event.position.y <= size.y - resize_margin.y
 				else 1
 			)
-			match _mouse_dragging_direction.y + _mouse_dragging_direction.y + _mouse_dragging_direction.y + _mouse_dragging_direction.x:
+			match new_dragging_direction.y + new_dragging_direction.y + new_dragging_direction.y + new_dragging_direction.x:
 				-4: mouse_default_cursor_shape = CURSOR_FDIAGSIZE
 				-3: mouse_default_cursor_shape = CURSOR_VSIZE
 				-2: mouse_default_cursor_shape = CURSOR_BDIAGSIZE
@@ -202,7 +207,9 @@ func _gui_input(event : InputEvent, called_by : Draggable = null):
 				+4: mouse_default_cursor_shape = CURSOR_FDIAGSIZE
 
 			Input.set_default_cursor_shape(0)
-			queue_redraw()
+			if new_dragging_direction != _mouse_dragging_direction:
+				_mouse_dragging_direction = new_dragging_direction
+				queue_redraw()
 
 	if event is InputEventMouseButton && event.button_index == MOUSE_BUTTON_LEFT:
 		if _affected_by_multi_selection == null:
@@ -216,7 +223,12 @@ func _gui_input(event : InputEvent, called_by : Draggable = null):
 			x._handle_click(event.pressed)
 
 
-func _universal_input(input_resize_direction : Vector2, drag_amount : Vector2):
+func _universal_input(input_resize_direction : Vector2i, drag_amount : Vector2):
+	if input_resize_direction == Vector2i.ZERO:
+		position += get_transform().basis_xform(drag_amount)
+		queue_redraw()
+		return
+
 	var is_diagonal := absi(input_resize_direction.x) + absi(input_resize_direction.y) == 2
 	if input_resize_direction.x != 0:
 		_size_buffered.x += drag_amount.x * input_resize_direction.x
@@ -225,10 +237,11 @@ func _universal_input(input_resize_direction : Vector2, drag_amount : Vector2):
 		_size_buffered.y += drag_amount.y * input_resize_direction.y
 
 	var pos_change := Vector2.ZERO
-	if (is_diagonal || input_resize_direction.x == 0) && input_resize_direction.y <= 0 && _size_buffered.y >= _get_resize_minimum_size().y:
+	var minsize := _get_resize_minimum_size()
+	if (is_diagonal || input_resize_direction.x == 0) && input_resize_direction.y <= 0 && _size_buffered.y >= minsize.y:
 		pos_change.y = drag_amount.y
 
-	if (is_diagonal || input_resize_direction.y == 0) && input_resize_direction.x <= 0 && _size_buffered.x >= _get_resize_minimum_size().x:
+	if (is_diagonal || input_resize_direction.y == 0) && input_resize_direction.x <= 0 && _size_buffered.x >= minsize.x:
 		pos_change.x = drag_amount.x
 
 	position += get_transform().basis_xform(pos_change)
@@ -265,8 +278,9 @@ func _get_resize_minimum_size() -> Vector2:
 	var result_size := Vector2(0.0, 0.0)
 	for x in get_children(true):
 		if x is Control:
-			result_size.x = maxf(result_size.x, x.get_combined_minimum_size().x)
-			result_size.y = maxf(result_size.y, x.get_combined_minimum_size().y)
+			var minsize : Vector2 = x.get_combined_minimum_size()
+			result_size.x = maxf(result_size.x, minsize.x)
+			result_size.y = maxf(result_size.y, minsize.y)
 
 	if resize_margin_offset_children:
 		result_size += resize_margin + resize_margin
