@@ -77,6 +77,7 @@ enum ItemAlignment {
 var cached_minimum_size := Vector2()
 
 static var _all_boxes : Array[InterpolatedContainer] = []
+static var _drag_touch_offset : Vector2 = Vector2.ZERO
 
 var _drag_insert_condition_exp : Expression
 var _dragging_node : Control
@@ -171,7 +172,7 @@ func _input(event : InputEvent):
 
 	if event is InputEventMouseMotion && _dragging_node != null:
 		if !(_dragging_node is Draggable):
-			_dragging_node.global_position += event.relative
+			_dragging_node.global_position = get_global_mouse_position() + _drag_touch_offset
 
 		drag_moved.emit(_dragging_node)
 		if allow_drag_reorder:
@@ -281,5 +282,6 @@ func _on_child_gui_input(event : InputEvent, child : Control):
 
 	if event is InputEventMouseButton && event.button_index == MOUSE_BUTTON_LEFT && event.pressed:
 		_dragging_node = child
+		_drag_touch_offset = child.global_position - get_global_mouse_position()
 		drag_started.emit(child)
 		set_process_input(true)
