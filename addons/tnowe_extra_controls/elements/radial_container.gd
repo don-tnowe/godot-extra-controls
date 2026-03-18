@@ -1,4 +1,5 @@
 @tool
+@icon("../icons/radial_container.png")
 class_name RadialContainer
 extends Container
 

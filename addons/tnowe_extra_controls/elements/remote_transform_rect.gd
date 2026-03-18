@@ -1,4 +1,5 @@
 @tool
+@icon("../icons/remote_transform_rect.png")
 class_name RemoteTransformRect
 extends Control
 

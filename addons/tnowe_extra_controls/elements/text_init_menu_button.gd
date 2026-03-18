@@ -1,4 +1,5 @@
 @tool
+@icon("../icons/text_init_menu_button.png")
 class_name TextInitMenuButton
 extends MenuButton
 
